@@ -1,0 +1,20 @@
+.splash-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background-color: #f3f3f3;
+  }
+  
+  .logo {
+    width: 200px;
+    margin-bottom: 20px;
+  }
+  
+  h1 {
+    font-family: 'Arial', sans-serif;
+    font-size: 36px;
+    color: #333;
+  }
+  

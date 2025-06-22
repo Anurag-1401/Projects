@@ -1,0 +1,75 @@
+
+.signup-container {
+    width: 100%;
+    max-width: 300px;
+    position: absolute;
+    top: 150px;
+    left: 750px;
+    padding: 20px;
+  }
+  
+  .signup-container label {
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+    color: #464040;
+  }
+  
+  .signup-container input {
+    width: 250px;
+    height: 50px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+  
+  .send-btn{
+    width: 85px;
+    padding: 5px;
+    margin-top: 5px;
+    background-color:#2f3f58;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .signup-container .signup-btn {
+    width: 250px;
+    padding: 12px;
+    margin-top: 20px;
+    background-color:#2f3f58;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .login-btn {
+    width: 60px;
+    padding: 12px;
+    margin-top: 20px;
+    background-color:#2f3f58;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .login-btn:hover{
+    background-color: #435a83;
+  }
+  
+  .signup-container .signup-btn:hover,.send-btn:hover {
+    background-color: #435a83;
+  }
+  
+  .signup-container .error {
+    color: #d9534f;
+    font-size: 0.9em;
+    font-weight: 700;
+    margin-top: 5px;
+  }
+  
