@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://wokerfinder.vercel.app"],
+    origin: ["http://localhost:5173", "https://workerfinder.vercel.app"],
     methods: ["POST", "GET", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
