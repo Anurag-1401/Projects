@@ -15,6 +15,13 @@ It simplifies service discovery by integrating search, real-time chat, admin upd
 
 ---
 
+## 📸 Preview
+
+🔗 [Live Demo](https://workerfinder.vercel.app/)
+
+---
+
+
 ## 🚀 Features
 
 - 🔍 **Search & Filter**: Find workers based on category, rating, or location.
