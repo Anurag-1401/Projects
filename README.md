@@ -4,7 +4,7 @@ This repository contains multiple full-stack and frontend/backend projects.
 
 ## 📂 Projects
 
-### 1. [Worker Finder](./Mini%20Project/README.md)
+### 1. [Worker Finder](./Mini%20Project/)
 A MERN-based worker finder app with user authentication, admin dashboard, and Razorpay payments.
 
 
