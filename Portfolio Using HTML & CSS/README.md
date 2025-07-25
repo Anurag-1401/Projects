@@ -14,7 +14,7 @@ A **responsive personal portfolio website** built using **HTML and Vanilla CSS**
 
 ## 📸 Preview
 
-🔗 [Live Demo](https://your-username.github.io/portfolio)  
+🔗 [Live Demo](https://portfolioactivity.vercel.app/)  
 *(Replace with actual live link or GitHub Pages deployment)*
 
 ---
