@@ -1,0 +1,121 @@
+ <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAdminMode(!isAdminMode)}
+              className="bg-transparent border-blue-400/50 text-blue-400 hover:bg-blue-400/10"
+            >
+              {isAdminMode ? <User className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+              {isAdminMode ? 'User View' : 'Admin'}
+            </Button>
+
+
+
+ {/* Skill Level Indicators */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="mt-16"
+        >
+          <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center">Proficiency Levels</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { skill: 'React & TypeScript', level: 95 },
+                  { skill: 'Node.js & Express', level: 90 },
+                  { skill: 'Database Design', level: 85 },
+                  { skill: 'UI/UX Design', level: 80 },
+                  { skill: 'DevOps & Deployment', level: 75 },
+                  { skill: 'Mobile Development', level: 70 }
+                ].map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white font-medium">{item.skill}</span>
+                      <span className="text-blue-400">{item.level}%</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${item.level}%` }}
+                        transition={{ duration: 1, delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+
+
+
+
+
+
+
+
+
+
+
+{
+      title: 'E-Commerce Platform',
+      description: 'A full-stack e-commerce solution with payment integration, inventory management, and admin dashboard.',
+      image: '/placeholder.svg',
+      technologies: ['React', 'Node.js', 'MongoDB', 'Stripe', 'Tailwind CSS'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: true
+    },
+    {
+      title: 'Task Management App',
+      description: 'Collaborative task management application with real-time updates, team collaboration features.',
+      image: '/placeholder.svg',
+      technologies: ['Vue.js', 'Express.js', 'PostgreSQL', 'Socket.io'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: true
+    },
+    {
+      title: 'Social Media Dashboard',
+      description: 'Analytics dashboard for social media management with data visualization and scheduling features.',
+      image: '/placeholder.svg',
+      technologies: ['React', 'Python', 'FastAPI', 'Chart.js'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: false
+    },
+    {
+      title: 'Weather App',
+      description: 'Beautiful weather application with location-based forecasts and interactive maps.',
+      image: '/placeholder.svg',
+      technologies: ['React Native', 'TypeScript', 'OpenWeather API'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: false
+    },
+    {
+      title: 'Blog Platform',
+      description: 'Modern blogging platform with markdown support, SEO optimization, and content management.',
+      image: '/placeholder.svg',
+      technologies: ['Next.js', 'Supabase', 'Markdown', 'Vercel'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: false
+    },
+    {
+      title: 'Portfolio Website',
+      description: 'Responsive portfolio website with admin panel and contact form integration.',
+      image: '/placeholder.svg',
+      technologies: ['React', 'Tailwind CSS', 'Framer Motion'],
+      liveUrl: '#',
+      githubUrl: '#',
+      featured: false
+    }
+
+
+    <img src="https://api.microlink.io/?url=https://example.com&screenshot=true" width="300" />
