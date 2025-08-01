@@ -31,7 +31,7 @@ app.get('/',(req , res) => {
 
 
 app.use(cors({
-    origin : ["http://localhost:8080", "http://localhost:8081", "http://10.70.46.39:8080/"],
+    origin : ["http://localhost:8080", "http://localhost:8081", "http://10.70.46.39:8080/","https://anurag-portfolio-eight-mu.vercel.app/"],
     methods : ["POST","GET","PUT","DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
