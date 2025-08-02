@@ -9,7 +9,7 @@ import { ArrowBigRight} from 'lucide-react';
 
 const AdminRegister = () => {
 
-const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
