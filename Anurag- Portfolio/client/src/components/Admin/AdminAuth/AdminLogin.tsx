@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/input';
 import party from 'party-js'
 
 const AdminLogin = () => {
+
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setrePassword] = useState("");
@@ -30,7 +33,7 @@ const handleClick = () => {
   const handleLogin = async () => {
     try {
 
-      const response = await axios.get('http://localhost:5000/api/get-admin/0',{params:{email,password}});
+      const response = await axios.get(`${baseUrl}http://localhost:5000/api/get-admin/0`,{params:{email,password}});
 
       if(response.status === 200){
         toast({
@@ -98,7 +101,7 @@ const handleClick = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:5000/api/reset-password',{params:{email,rePassword}});
+      const response = await axios.get(`${baseUrl}http://localhost:5000/api/reset-password`,{params:{email,rePassword}});
 
       if(response.status === 200){
         toast({
