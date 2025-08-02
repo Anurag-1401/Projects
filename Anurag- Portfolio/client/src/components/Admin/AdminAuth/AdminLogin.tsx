@@ -33,7 +33,7 @@ const handleClick = () => {
   const handleLogin = async () => {
     try {
 
-      const response = await axios.get(`${baseUrl}http://localhost:5000/api/get-admin/0`,{params:{email,password}});
+      const response = await axios.get(`${baseUrl}/api/get-admin/0`,{params:{email,password}});
 
       if(response.status === 200){
         toast({
@@ -101,7 +101,7 @@ const handleClick = () => {
     }
 
     try {
-      const response = await axios.get(`${baseUrl}http://localhost:5000/api/reset-password`,{params:{email,rePassword}});
+      const response = await axios.get(`${baseUrl}/api/reset-password`,{params:{email,rePassword}});
 
       if(response.status === 200){
         toast({
