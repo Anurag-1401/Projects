@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ContactSection = () => {
 
-   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate()
 
