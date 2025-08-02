@@ -10,7 +10,7 @@ import party from 'party-js'
 
 const Messages = () =>{
 
-    const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+    const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
     
     const [messages,setMessages] = useState('');
     const [reply, setReply] = useState(false);
