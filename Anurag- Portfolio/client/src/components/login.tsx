@@ -32,7 +32,7 @@ declare global {
 
 export default function Login() {
 
-   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
 const navigate = useNavigate();
 const location = useLocation();
