@@ -5,6 +5,9 @@ import { toast } from "@/components/ui/use-toast";
 
 
 const AdminAccessGate = () => {
+
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
 
@@ -16,7 +19,7 @@ const AdminAccessGate = () => {
   const checkIfAdminExists = async () => {
    
     try {
-      const response = await axios.get('http://localhost:5000/api/get-admin/1');
+      const response = await axios.get(`${baseUrl}/api/get-admin/1`);
       if (response.status === 200) {
         navigate("/admin-login",{replace:true});
         console.log(response,response.data.Admin)
