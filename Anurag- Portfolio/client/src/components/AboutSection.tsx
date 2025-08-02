@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const AboutSection = () => {
 
-   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const feat = {
     Code,Bot,Database,Users
