@@ -12,6 +12,9 @@ import party from 'party-js'
 
 
 const Experience = () => {
+
+const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const [suggestedTechsAi, setSuggestedTechsAi] = useState([]);
   const [isEdit,setisEdit] = useState(false)
   const [isEdit1,setisEdit1] = useState(false)
@@ -52,7 +55,7 @@ const handleClick = () => {
 
         setIsLoading(true)
 
-        const response = await axios.post('http://localhost:5000/api/tech-sugg',{post})
+        const response = await axios.post(`${baseUrl}/api/tech-sugg`,{post})
   
         if(response.status == 200){
           setSuggestedTechsAi(response.data.JobTech.technologies);
@@ -99,7 +102,7 @@ const handleClick = () => {
           technologies: tech
         };
 
-        const response = await axios.post('http://localhost:5000/api/add-experience',payload)
+        const response = await axios.post(`${baseUrl}/api/add-experience`,payload)
         if (response.status == 201){
           console.log("Experience added",response.data.data)
 
@@ -146,7 +149,7 @@ const handleClick = () => {
         try {
 
           if(id.length>0) {
-            const response = await axios.get(`http://localhost:5000/api/get-experience?id=${id}`);
+            const response = await axios.get(`${baseUrl}/api/get-experience?id=${id}`);
             if(response.status == 200){
               console.log("id",response.data.data)
               setNewExperience(response.data.data)
@@ -156,7 +159,7 @@ const handleClick = () => {
             }
             
           } else {
-            const response = await axios.get('http://localhost:5000/api/get-experience');
+            const response = await axios.get(`${baseUrl}/api/get-experience`);
              if(response.status == 200){
                setExperiences(response.data.data)
                console.log(response.data.data)
@@ -189,7 +192,7 @@ const handleClick = () => {
           technologies: tech
         };
 
-          const response = await axios.put(`http://localhost:5000/api/edit-experience/${id}`,payload);
+          const response = await axios.put(`${baseUrl}/api/edit-experience/${id}`,payload);
 
         if(response.status == 200){
           console.log("Experience Updated : ",response.data.data)
@@ -227,7 +230,7 @@ const handleClick = () => {
 
       const handleDeleteExperience = async (id: number) => {
         try {
-          const response = await axios.delete(`http://localhost:5000/api/del-experience/${id}`)
+          const response = await axios.delete(`${baseUrl}/api/del-experience/${id}`)
 
           if(response.status == 200) {
             console.log("Experience Deleted",response.data.project)
