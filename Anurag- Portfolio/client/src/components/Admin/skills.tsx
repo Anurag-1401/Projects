@@ -11,6 +11,9 @@ import party  from 'party-js';
 
 
 const Skills = () => {
+
+   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+    
   const [suggestedTechsAi, setSuggestedTechsAi] = useState([]);
   const [isEdit,setisEdit] = useState(false)
   const [isDelete,setisDelete] = useState(false)
@@ -53,7 +56,7 @@ const fetchSugg = async (category:string) => {
     setIsLoading(true)
     setisbtn(false)
 
-    const response = await axios.post(`http://localhost:5000/api/tech-sugg?cat=${category}`)
+    const response = await axios.post(`${baseUrl}/api/tech-sugg?cat=${category}`)
 
     if(response.status == 200){
       setSuggestedTechsAi(response.data.Category);
@@ -103,7 +106,7 @@ const handleAddSkills = async (category:string) => {
       category: category,
       skills: skillsArray,
     };
-  const response = await axios.post('http://localhost:5000/api/add-skills',dataToSend)
+  const response = await axios.post(`${baseUrl}/api/add-skills`,dataToSend)
   if (response.status == 201){
     console.log("Project added",response.data.data)
 
@@ -151,7 +154,7 @@ const handleAddSkills = async (category:string) => {
 const getSkills = async () => {
 
   try{
-  const response = await axios.get('http://localhost:5000/api/get-skills');
+  const response = await axios.get(`${baseUrl}/api/get-skills`);
      if(response.status == 200){
        setSkills(response.data.Skills)
      } else {
@@ -192,7 +195,7 @@ const getSkills = async () => {
     };
 
 
-  const response = await axios.put(`http://localhost:5000/api/edit-skills`,dataToSend);
+  const response = await axios.put(`${baseUrl}/api/edit-skills`,dataToSend);
   if(response.status == 200){
     console.log("Skills Updated : ",response.data.Skills)
     toast({
@@ -220,7 +223,7 @@ const getSkills = async () => {
 
 const handleDeleteSkills = async (category:string) => {
   try {
-    const response = await axios.delete('http://localhost:5000/api/del-skills',{data:{category}})
+    const response = await axios.delete(`${baseUrl}/api/del-skills`,{data:{category}})
 
     if(response.status == 200) {
       console.log("Skill Deleted",response.data.Ski)
