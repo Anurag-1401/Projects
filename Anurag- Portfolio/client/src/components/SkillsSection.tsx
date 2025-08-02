@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 
 const SkillsSection = () => {
 
-  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
  
   const [skills, setSkills] = useState([]);
 
