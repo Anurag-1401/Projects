@@ -13,7 +13,7 @@ import party from 'party-js'
 
 const Experience = () => {
 
-const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const [suggestedTechsAi, setSuggestedTechsAi] = useState([]);
   const [isEdit,setisEdit] = useState(false)
