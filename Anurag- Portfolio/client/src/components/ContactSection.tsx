@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 
 const ContactSection = () => {
 
+   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate()
 
   const [profileData, setProfileData] = useState({
@@ -54,7 +56,7 @@ const ContactSection = () => {
     }
     
     try {
-    const response = await axios.post('http://localhost:5000/api/send-mail' , formData)
+    const response = await axios.post(`${baseUrl}/api/send-mail`, formData)
       if(response.status == 201){
     
       console.log(response.data.message)
@@ -97,7 +99,7 @@ const ContactSection = () => {
 
   const fetchAdmin = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/getAdminDetails')
+      const response = await axios.get(`${baseUrl}http://localhost:5000/api/getAdminDetails`)
       if (response.status == 200) {
         setProfileData(response.data.Admin)
         console.log(response)
