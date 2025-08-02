@@ -11,7 +11,7 @@ import party from 'party-js'
 
 const Profile = () => {
 
-  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const [isEdit,setisEdit] = useState(false);
   const [fields, setFields] = useState([{ title: '', value: '' ,icon:''}]);
