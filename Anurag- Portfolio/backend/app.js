@@ -3,18 +3,11 @@ const connectDB = require('./db')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const Router = require('./Routes/routes')
-const admin = require("firebase-admin");
 
 
 
 const app = express()
 app.use(express.json())
-
-const serviceAccount = require("./andy-port-firebase-adminsdk-fbsvc-9ab63989c0.json");
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
 
 
 
