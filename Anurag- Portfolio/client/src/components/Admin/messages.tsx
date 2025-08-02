@@ -9,6 +9,9 @@ import party from 'party-js'
 
 
 const Messages = () =>{
+
+    const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+    
     const [messages,setMessages] = useState('');
     const [reply, setReply] = useState(false);
     const [selectMsg, setSelectMsg] = useState([]);
@@ -38,7 +41,7 @@ const handleClick = () => {
 
     const fetchMessages = async () =>{
         try {
-            const response =await axios.get('http://localhost:5000/api/get-form')
+            const response =await axios.get(`${baseUrl}/api/get-form`)
             if(response.status == 200){
                 setSelectMsg(response.data.Messages);
                 console.log(response.data.Messages);
@@ -57,7 +60,7 @@ const handleDeleteMessage = async (id:string) => {
   setisDelete(false);
   setActiveBtn('');
   try {
-    const response = await axios.delete(`http://localhost:5000/api/del-form/${id}`);
+    const response = await axios.delete(`${baseUrl}/api/del-form/${id}`);
     if(response.status == 200){
       console.log("Message Deleted",response.data.Msg);
 
@@ -87,7 +90,7 @@ const handleSendMail = async (messageObj) => {
       ...messageObj,
       message:messages
     }
-    const response = await axios.post('http://localhost:5000/api/sendreply-mail',data);
+    const response = await axios.post(`${baseUrl}/api/sendreply-mail`,data);
     if(response.status == 201){
       console.log(response.data.message,response.data.mail);
 
