@@ -10,6 +10,8 @@ import { toast } from '@/hooks/use-toast';
 
 const ExperienceSection = () => {
 
+   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
 const [experiences, setExperiences] = useState([]);
 const sorted = experiences.sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   
@@ -19,7 +21,7 @@ useEffect(()=>{
 
 const fetchExperience = async () => {
   try {
-      const response = await axios.get('http://localhost:5000/api/get-experience');
+      const response = await axios.get(`${baseUrl}/api/get-experience`);
        if(response.status == 200){
          setExperiences(response.data.data)
        } else {
