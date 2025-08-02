@@ -12,6 +12,9 @@ import party from 'party-js'
 
 
 const Projects = () => {
+
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const [suggestedTechsAi, setSuggestedTechsAi] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoading1, setIsLoading1] = useState(false);
@@ -54,7 +57,7 @@ const handleClick = () => {
 
           setIsLoading(true)
 
-          const response = await axios.post('http://localhost:5000/api/tech-sugg',{title,description})
+          const response = await axios.post(`${baseUrl}/api/tech-sugg`,{title,description})
     
           if(response.status == 200){
             setSuggestedTechsAi(response.data.tech);
@@ -123,7 +126,7 @@ const handleClick = () => {
           ...newProject,
           technologies: techString.split(',').map(t=>t.trim()).filter(Boolean)
         };
-        const response = await axios.post('http://localhost:5000/api/add-project',payload)
+        const response = await axios.post(`${baseUrl}/api/add-project`,payload)
         if (response.status == 201){
           console.log("Project added",response.data.data)
 
@@ -170,7 +173,7 @@ const handleClick = () => {
         try {
 
           if(id.length>0) {
-            const response = await axios.get(`http://localhost:5000/api/get-projects?id=${id}`);
+            const response = await axios.get(`${baseUrl}/api/get-projects?id=${id}`);
             if(response.status == 200){
               console.log("id",response.data.project)
               setNewProject(response.data.project)
@@ -179,7 +182,7 @@ const handleClick = () => {
             }
             
           } else {
-            const response = await axios.get('http://localhost:5000/api/get-projects');
+            const response = await axios.get(`${baseUrl}/api/get-projects`);
              if(response.status == 200){
                setProjects(response.data.project)
                console.log(response.data.project)
@@ -208,7 +211,7 @@ const handleClick = () => {
             technologies: techString.split(',').map(t=>t.trim()).filter(Boolean)
           };
 
-          const response = await axios.put(`http://localhost:5000/api/edit-projects/${id}`,payload);
+          const response = await axios.put(`${baseUrl}/api/edit-projects/${id}`,payload);
 
         if(response.status == 200){
           console.log("Project Updated : ",response.data.project)
@@ -247,7 +250,7 @@ const handleClick = () => {
 
       const handleDeleteProject = async (id: number) => {
         try {
-          const response = await axios.delete(`http://localhost:5000/api/del-project/${id}`)
+          const response = await axios.delete(`${baseUrl}/api/del-project/${id}`)
 
           if(response.status == 200) {
             console.log("Project Deleted",response.data.project)
