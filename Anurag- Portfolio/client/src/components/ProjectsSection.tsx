@@ -19,7 +19,7 @@ const ProjectsSection = () => {
 
   useEffect(()=>{
     fetchProjects()
-  })
+  },[])
 
   const fetchProjects = async () => {
     try {
