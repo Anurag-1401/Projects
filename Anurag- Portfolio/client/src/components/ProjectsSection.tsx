@@ -9,9 +9,11 @@ import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 
- const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
 
 const ProjectsSection = () => {
+
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
   const navigate = useNavigate()
 
@@ -23,6 +25,7 @@ const ProjectsSection = () => {
 
   const fetchProjects = async () => {
     try {
+     console.log(baseUrl);
         const response = await axios.get(`${baseUrl}/api/get-projects`);
          if(response.status == 200){
            setProjects(response.data.project)
