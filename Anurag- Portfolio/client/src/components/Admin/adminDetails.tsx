@@ -16,6 +16,9 @@ const AdminDetails = () => {
       const [visitor,setVisitor] = useState([]);
 
 const handleClick = () => {
+
+    const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
       const btn = document.getElementById('confettiBtn');
       if (btn) {
         party.confetti(btn, {
@@ -35,7 +38,7 @@ useEffect(()=>{
 
 const fetchVisitors = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/get-visitors');
+        const response = await axios.get(`${baseUrl}/api/get-visitors`);
 
         if(response.status === 200){
             setVisitor(response.data.Visitors);
@@ -49,7 +52,7 @@ const fetchVisitors = async () => {
 
 const fetchAdmin = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/get-admin/1');
+    const response = await axios.get(`${baseUrl}/api/get-admin/1`);
     if (response.status === 200) {
       credentials.email = response.data.Admin.email;
       credentials.password = response.data.Admin.password;
@@ -80,7 +83,7 @@ const handleForgotPassword = async () => {
         }
     
   try {
-      const response = await axios.put('http://localhost:5000/api/reset-password',{
+      const response = await axios.put(`${baseUrl}/api/reset-password`,{
         email: credentials.email,
         Password:credentials.password,
         rePassword,
