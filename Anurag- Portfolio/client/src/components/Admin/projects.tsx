@@ -13,7 +13,7 @@ import party from 'party-js'
 
 const Projects = () => {
 
-  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const [suggestedTechsAi, setSuggestedTechsAi] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
