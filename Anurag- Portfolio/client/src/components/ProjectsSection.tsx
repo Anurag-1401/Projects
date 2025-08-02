@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
  
 const ProjectsSection = () => {
 
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
   const navigate = useNavigate()
 
   const [projects,setProjects] = useState([]);
@@ -21,7 +23,7 @@ const ProjectsSection = () => {
 
   const fetchProjects = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/get-projects');
+        const response = await axios.get(`${baseUrl}/api/get-projects`);
          if(response.status == 200){
            setProjects(response.data.project)
          } else {
