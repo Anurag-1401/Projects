@@ -8,10 +8,10 @@ import axios from 'axios';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
- 
-const ProjectsSection = () => {
 
-  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+ const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
+const ProjectsSection = () => {
 
   const navigate = useNavigate()
 
