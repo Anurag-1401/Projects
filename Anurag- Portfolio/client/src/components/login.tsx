@@ -32,6 +32,7 @@ declare global {
 
 export default function Login() {
 
+   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
 const navigate = useNavigate();
 const location = useLocation();
@@ -53,7 +54,7 @@ const redirectPath = location.state?.from || "/";
 
   const sendTokenToBackend = async () => {
     const idToken = await auth.currentUser.getIdToken();
-    fetch('http://localhost:5000/api/profile', {
+    fetch(`${baseUrl}/api/profile`, {
       headers: {
         Authorization: `Bearer ${idToken}`,
       },
@@ -78,7 +79,7 @@ const redirectPath = location.state?.from || "/";
         photo: user.photoURL,
       };
 
-      const response = await axios.post('http://localhost:5000/api/user',userData)
+      const response = await axios.post(`${baseUrl}/api/user`,userData)
       if(response.status === 201){
         console.log(response)
       };
@@ -183,7 +184,7 @@ const redirectPath = location.state?.from || "/";
         photo: res.user.photoURL,
       };
   
-      const response = await axios.post('http://localhost:5000/api/user', userData);
+      const response = await axios.post(`${baseUrl}/api/user`, userData);
   
       if (response.status === 201) {
         console.log("User saved to DB:", response.data);
@@ -216,7 +217,7 @@ const redirectPath = location.state?.from || "/";
           photo: res.user.photoURL,
         };
   
-        const response = await axios.post('http://localhost:5000/api/user',userData)
+        const response = await axios.post(`${baseUrl}/api/user`,userData)
         if(response.status === 201){
           console.log(response)
         };
@@ -295,7 +296,7 @@ const appVerifier = window.recaptchaVerifier;
               photo: result.user.photoURL || "",
             };
       
-            const response = await axios.post('http://localhost:5000/api/user', userData);
+            const response = await axios.post(`${baseUrl}/api/user`, userData);
             if (response.status === 201 || response.status === 200) {
               console.log('User stored:', response.data);
             }
