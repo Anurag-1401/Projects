@@ -10,6 +10,9 @@ import party from 'party-js'
 
 
 const Profile = () => {
+
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const [isEdit,setisEdit] = useState(false);
   const [fields, setFields] = useState([{ title: '', value: '' ,icon:''}]);
   const [facts, setFacts] = useState([{fact:''}]);
@@ -60,7 +63,7 @@ const handleClick = () => {
 
   const fetchAdmin = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/getAdminDetails')
+      const response = await axios.get(`${baseUrl}/api/getAdminDetails`)
       if (response.status == 200) {
         setProfileData(response.data.Admin)
         setFacts(response.data.Admin.facts.map(t=>({fact:t})))
@@ -98,7 +101,7 @@ const handleClick = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/admin' , data)
+      const response = await axios.post(`${baseUrl}/api/admin` , data)
         if (response.status == 201) {
           toast({
             title: "Profile Updated",
