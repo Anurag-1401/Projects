@@ -8,6 +8,9 @@ import { ArrowBigRight} from 'lucide-react';
 
 
 const AdminRegister = () => {
+
+const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [conPassword, setConPassword] = useState("");
@@ -30,7 +33,7 @@ const AdminRegister = () => {
 
     try {
 
-      const response = await axios.post('http://localhost:5000/api/add-admin',{email,password});
+      const response = await axios.post(`${baseUrl}/api/add-admin`,{email,password});
 
       if(response.status === 201) {
         console.log(response,response.data.Admin);
