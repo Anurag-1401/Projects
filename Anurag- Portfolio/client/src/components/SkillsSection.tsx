@@ -6,6 +6,8 @@ import axios from 'axios';
 import { toast } from '@/hooks/use-toast';
 
 const SkillsSection = () => {
+
+  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
  
   const [skills, setSkills] = useState([]);
 
@@ -17,7 +19,7 @@ const SkillsSection = () => {
 const getSkills = async () => {
 
 try{
-const response = await axios.get('http://localhost:5000/api/get-skills');
+const response = await axios.get(`${baseUrl}/api/get-skills`);
   if(response.status == 200){
     setSkills(response.data.Skills)
   } else {
