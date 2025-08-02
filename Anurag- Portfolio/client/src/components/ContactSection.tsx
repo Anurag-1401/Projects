@@ -42,6 +42,8 @@ const ContactSection = () => {
     }));
   };
 
+
+   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -54,8 +56,11 @@ const ContactSection = () => {
     
       return;
     }
-    
+       const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
     try {
+          const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
     const response = await axios.post(`${baseUrl}/api/send-mail`, formData)
       if(response.status == 201){
     
