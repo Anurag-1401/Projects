@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AboutSection = () => {
+
+   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  
   const feat = {
     Code,Bot,Database,Users
   };
@@ -31,7 +34,7 @@ const AboutSection = () => {
 
     const fetchAdmin = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/getAdminDetails')
+        const response = await axios.get(`${baseUrl}/api/getAdminDetails`)
         if (response.status == 200) {
           setProfileData(response.data.Admin)
         }
