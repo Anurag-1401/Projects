@@ -6,7 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 
 const AdminAccessGate = () => {
 
-  const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
