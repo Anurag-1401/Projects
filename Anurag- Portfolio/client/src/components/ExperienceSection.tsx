@@ -10,7 +10,7 @@ import { toast } from '@/hooks/use-toast';
 
 const ExperienceSection = () => {
 
-   const baseURL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
 const [experiences, setExperiences] = useState([]);
 const sorted = experiences.sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
