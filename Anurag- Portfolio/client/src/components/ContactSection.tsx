@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Instagram,Home } from 'lucide-react';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import party from 'party-js'
 
 
 const ContactSection = () => {
