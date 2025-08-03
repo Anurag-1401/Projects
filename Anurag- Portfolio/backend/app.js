@@ -24,7 +24,7 @@ app.get('/',(req , res) => {
 
 
 app.use(cors({
-    origin : ["https://anurag-portfolio-psi.vercel.app/","http://localhost:8080", "http://localhost:8081", "http://10.70.46.39:8080/"],
+    origin : ["https://anurag-portfolio-psi.vercel.app","http://localhost:8080", "http://localhost:8081", "http://10.70.46.39:8080"],
     methods : ["POST","GET","PUT","DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
