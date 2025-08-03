@@ -72,6 +72,11 @@ const redirectPath = location.state?.from || "/";
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+       await sendTokenToBackend(); 
+
+       navigate(redirectPath, { replace: true });
+      
+
       const userData = {
         email: user.email,
         name: user.displayName,
@@ -89,24 +94,24 @@ const redirectPath = location.state?.from || "/";
         title: "Login Successful",
         description: `Welcome back, ${user.email}`,
       });
-
-      navigate(redirectPath, { replace: true });
   
     } catch (error: any) {
       if (error.code === "auth/user-not-found") {
         try {
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const newUser = userCredential.user;
+
+          await sendTokenToBackend(); 
+
+           navigate(redirectPath, { replace: true });
   
           console.log("✅ New User Registered:", newUser.email);
           toast({
             title: "Signup Successful",
             description: `Account created for ${newUser.email}`,
           });
-
-          navigate(redirectPath, { replace: true });
   
-        } catch (signupError: any) {
+    } catch (signupError: any) {
           console.error("❌ Signup Error:", signupError);
           toast({
             title: "Signup Failed",
@@ -176,6 +181,8 @@ const redirectPath = location.state?.from || "/";
       console.log("Google Sign-in", res.user);
   
       await sendTokenToBackend(); 
+
+      navigate(redirectPath, { replace: true });
   
       const userData = {
         email: res.user.email,
@@ -189,9 +196,8 @@ const redirectPath = location.state?.from || "/";
       if (response.status === 201) {
         console.log("User saved to DB:", response.data);
       }
-  
-      navigate(redirectPath, { replace: true });
-    } catch (err) {
+
+  } catch (err) {
       if (err.code === "auth/popup-closed-by-user") {
         alert("You closed the Google Sign-In popup. Please try again.");
       } else if (err.code === "auth/cancelled-popup-request") {
@@ -210,6 +216,8 @@ const redirectPath = location.state?.from || "/";
         console.log("GitHub Sign-in", res.user);
         await sendTokenToBackend(); 
 
+        navigate(redirectPath, { replace: true });
+
         const userData = {
           email: res.user.email,
           name: res.user.displayName,
@@ -222,7 +230,7 @@ const redirectPath = location.state?.from || "/";
           console.log(response)
         };
 
-        navigate(redirectPath, { replace: true });
+        
       })
       .catch(err => {console.error(err);
         toast({
