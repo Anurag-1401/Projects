@@ -25,28 +25,46 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          
           <Route path="/" element={<HeroSection />} />
+          
           <Route path="/login" element={<Login />} />
+          
           <Route path="/admin" element={<AdminAccessGate />} />
+
+          <Route path="/admin-register" element={<AdminRegister />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
           
           <Route
           path="/admin-profile"
           element={ <ProtectedAdminRoute> <Index access={true} /> </ProtectedAdminRoute> }/>
 
-          <Route path="/admin/details" element={<AdminDetails />} />
-          <Route path="/admin-register" element={<AdminRegister />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
+           <Route path="/admin/details" element={
+          <ProtectedAdminRoute><AdminDetails /></ProtectedAdminRoute>
+          } />
+          
 
-          <Route path="/project" element={<ProjectsSection />} />
-          <Route path="/contact" element={<ContactSection />} />
-          <Route path="/admin/messages" element={<Index access="msg"/> }></Route>
+          <Route path="/admin/messages" element={
+          <ProtectedAdminRoute><Index access="msg" /></ProtectedAdminRoute>
+          } />
 
+          
 
-          <Route path="/explore" element={<PrivateRoute>
-            <Index access={false} />
-          </PrivateRoute>}/>
+          
+          <Route path="/explore" element={
+            <PrivateRoute> <Index access={false} /> </PrivateRoute>
+          }/>
+
+          <Route path="/project" element={
+          <PrivateRoute> <ProjectsSection />  </PrivateRoute> 
+          } />
+          
+          <Route path="/contact" element={
+          <PrivateRoute> <ContactSection /> </PrivateRoute>
+          } />
 
           <Route path="*" element={<NotFound />} />
+          
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
