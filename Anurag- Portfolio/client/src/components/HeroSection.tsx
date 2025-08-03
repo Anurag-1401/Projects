@@ -65,7 +65,7 @@ const email = "bhavthankaranurag@gmail.com";
   </div>
 
 
-      <div className="ml-5 w-64 h-[450px] sm:w-64 sm:h-75 md:w-80 md:h-85 mb-10 md:mb-20 relative -top-[20px] md:-top-[50px] 
+      <div className="ml-5 w-64 h-[450px] sm:w-64 sm:h-75 md:w-80 md:h-85 mb-5 mt-10 md:mb-20 relative -top-[20px] md:-top-[50px] 
       overflow-hidden shadow-lg  hover:scale-110 transition-transform duration-300 border p-2">
       <img src={Profile} className="w-full h-full object-cover" alt="" />
       </div>
