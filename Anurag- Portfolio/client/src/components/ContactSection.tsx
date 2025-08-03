@@ -15,6 +15,20 @@ const ContactSection = () => {
 
    const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
+
+const handleClick = () => {
+      const btn = document.getElementById('confettiBtn');
+      if (btn) {
+        party.confetti(btn, {
+          count: party.variation.range(40, 60),
+          spread: 70,
+          speed: party.variation.range(500, 800),
+        });
+      }
+    };
+
+   
+
   const navigate = useNavigate()
 
   const [profileData, setProfileData] = useState({
@@ -56,15 +70,13 @@ const ContactSection = () => {
     
       return;
     }
-       const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
     try {
-          const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
-
     const response = await axios.post(`${baseUrl}/api/send-mail`, formData)
       if(response.status == 201){
-    
-      console.log(response.data.message)
+
+      handleClick();
+      console.log(response.data.message);
     toast({
       title: "Message sent!",
       description: "Thank you for your message. I'll get back to you soon.",
@@ -358,7 +370,7 @@ const ContactSection = () => {
                     />
                   </div>
                   
-                  <Button
+                  <Button id="confettiBtn"
                     type="submit"
                     className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105"
                   >
