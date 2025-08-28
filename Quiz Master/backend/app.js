@@ -1,4 +1,4 @@
-const path = require("path");
+// const path = require("path");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -8,7 +8,7 @@ const routes = require("./Routes/routes");
 connectDB();
 
 const app = express();
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 app.use(cors({
     origin: ["http://localhost:8080","https://quiz-master-ochre-theta.vercel.app"],
@@ -25,9 +25,9 @@ app.get('/', (req, res) => {
 
 app.use('/api', routes);
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+// });
 
 
 
