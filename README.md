@@ -15,8 +15,10 @@ A Tailwind based web page of the Actual Razorpay Organisation.
 ### 3. [Anurag's Portfolio](./Anurag-%20Portfolio/README.md)
 A modern portfolio that speaks code, creativity, and credibility.
 
+### 4. [Quiz Master](./Quiz%20Master/README.md)
+A platform to create play quizzes and manage results.
 
-### 4. [Portfolio Using HTML-CSS](./Portfolio%20Using%20HTML%20%26%20CSS/README.md)
+### 5. [Portfolio Using HTML-CSS](./Portfolio%20Using%20HTML%20%26%20CSS/README.md)
 A Portfolio created using Vanilla HTML & CSS
 
 
