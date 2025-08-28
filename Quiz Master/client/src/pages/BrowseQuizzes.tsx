@@ -29,7 +29,7 @@ export function BrowseQuizzes() {
   const { toast } = useToast();
   useEffect(() => {
 
-    let filtered = quizzes.filter((q) =>q.createdBy !== logger?.Email && attempted.some((qa) => qa.quizId !== q._id));
+    let filtered = quizzes.filter((q) =>q.createdBy !== logger?.Email && !attempted.some((qa) => qa.quizId === q._id));
   
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
