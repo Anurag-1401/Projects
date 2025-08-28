@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:8080"],
+    origin: ["http://localhost:8080","https://quiz-master-ochre-theta.vercel.app"],
     methods: ["POST", "GET", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
