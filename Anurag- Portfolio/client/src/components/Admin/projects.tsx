@@ -22,7 +22,8 @@ const Projects = () => {
   const [orLoading,setOrLoading] = useState(true)
   const [thumbLod,setThumbLod] =useState(false)
   const [projects,setProjects] = useState([]);
-  const [isEdit,setisEdit] = useState(false)
+  const [isEdit,setisEdit] = useState(false);
+  const [add,setAdd] = useState(false);
   const [editP,seteditP] = useState('')
   const [techString,setTechString] = useState('')
 
@@ -288,6 +289,7 @@ const handleClick = () => {
                 size="sm"
                 onClick={() => { 
                   setisEdit(prev => !prev);
+                  setAdd(prev=>!prev);
                   {isEdit && setTimeout(() => {
                     window.location.reload();
                   }, 500);}
@@ -471,12 +473,12 @@ const handleClick = () => {
              
           {newProject.demo.length>20 && <div className="flex gap-2">
             <Button  id="confettiBtn"
-              onClick={() => {isEdit ? handleUpdateProject(editP.toString()) : handleAddProject();
+              onClick={() => {isEdit && add ? handleAddProject() : handleUpdateProject(editP.toString());
               }}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 flex-1"
             >
               <Save className="w-4 h-4 mr-2" />
-              {isEdit ? 'Update Project' :'Add Project'}
+              {isEdit && add ? 'Add Project' :'Update Project'}
             </Button>
             
           </div>}
