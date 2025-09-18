@@ -19,7 +19,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],
+    allow_origins=["http://localhost:8080","https://sggshostel.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
