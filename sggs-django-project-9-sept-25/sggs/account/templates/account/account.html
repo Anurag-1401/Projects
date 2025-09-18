@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Account Page
+{% endblock %}
+
+{% block content %}
+
+    <h1>Account of Students</h1>
+
+    <div class="grid grid-cols-3 gap-4 m-4">
+        {% for a in account %}
+        <div class="bg-blue-800 p-5 rounded">
+            <h3>{{a.regno}}</h3>
+
+            <a href="{% url 'accView' a.id %}">
+                <button type="button">
+                    {{a.id}}
+                </button>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% endblock %}

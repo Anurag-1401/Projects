@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block title %}Hostel Details{% endblock %}
+
+{% block content %}
+<h2>Hostel Details</h2>
+<p><b>Reg No:</b> {{ hostdet.regno }}</p>
+<p><b>Hostel:</b> {{ hostdet.hostelName }}</p>
+
+<a href="{% url 'hostelView' %}">🔙 Back to all accounts</a>
+{% endblock %}
