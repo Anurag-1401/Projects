@@ -28,6 +28,8 @@ python-slugify==8.0.4
 reportlab==4.4.3
 requests==2.32.4
 SQLAlchemy==2.0.41
+sqlitecloud==0.0.88
 sqlparse==0.5.3
 uvicorn[standard]==0.34.3
 uvloop==0.21.0
+
