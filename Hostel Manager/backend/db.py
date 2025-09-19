@@ -1,30 +1,30 @@
-# from sqlalchemy import create_engine
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.orm import sessionmaker
-
-# SQLALCHEMY_DB_URL = 'sqlite:///./storage.db'
-
-# engine = create_engine(SQLALCHEMY_DB_URL,connect_args={"check_same_thread":False})
-
-# SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
-
-# Base = declarative_base()
-
-
-# def get_db():
-#     db = SessionLocal()
-
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-
-
-
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+SQLALCHEMY_DB_URL = 'sqlite:///./storage.db'
+
+engine = create_engine(SQLALCHEMY_DB_URL,connect_args={"check_same_thread":False})
+
+SessionLocal = sessionmaker(autocommit=False,autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+
+
+# from sqlalchemy import create_engine
+# from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.orm import sessionmaker
 # import sqlitecloud
 
 # # Your SQLite Cloud connection string
@@ -39,19 +39,21 @@ from sqlalchemy.orm import sessionmaker
 #     creator=get_sqlitecloud_connection
 # )
 
-import os
 
-DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL, echo=True) 
+# import os
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
-Base = declarative_base()
+# engine = create_engine(DATABASE_URL, echo=True) 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base = declarative_base()
+
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
