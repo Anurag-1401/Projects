@@ -1,25 +1,25 @@
 import os
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import json
 import firebase_admin
 from firebase_admin import auth, credentials
-
-# Default path for Render
-FIREBASE_SECRET_PATH = "/etc/secrets/firebase-key.json"
-
-# Local fallback path (adjust to your local file path)
-LOCAL_SECRET_PATH = "/home/andy/working/Hostel Manager/backend/hostel-management-29452-firebase-adminsdk-fbsvc-6a8733b698.json"
-
-# Use Render secret if available, otherwise local file
-cred_path = FIREBASE_SECRET_PATH if os.path.exists(FIREBASE_SECRET_PATH) else LOCAL_SECRET_PATH
-
-# Initialize Firebase only once
-if not firebase_admin._apps:
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 security = HTTPBearer()
 
+# Load Firebase JSON from environment variable
+firebase_json = os.environ.get("FIREBASE_JSON")
+if not firebase_json:
+    raise Exception("FIREBASE_JSON env variable not set")
+
+cred_dict = json.loads(firebase_json)
+
+# Initialize Firebase only once
+if not firebase_admin._apps:
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+
+# Function to verify Firebase token
 async def get_current_user(token: HTTPAuthorizationCredentials = Depends(security)):
     try:
         decoded_token = auth.verify_id_token(token.credentials)
