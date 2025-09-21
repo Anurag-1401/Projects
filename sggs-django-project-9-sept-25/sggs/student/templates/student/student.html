@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Student Page
+{% endblock %}
+
+{% block content %}
+
+    <h1>Students</h1>
+
+    <div class="grid grid-cols-3 gap-4 m-4">
+        {% for a in student %}
+        <div class="bg-blue-800 p-5 rounded">
+            <h3>{{a.name}}</h3>
+
+            <a href="{% url 'stuView' a.id %}">
+                <button type="button">
+                    {{a.regno}}
+                </button>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% endblock %}

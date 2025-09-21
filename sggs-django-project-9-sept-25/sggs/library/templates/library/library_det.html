@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %}Library Details{% endblock %}
+
+{% block content %}
+<h2>Library Details</h2>
+<p><b>Reg No:</b> {{ libdet.regno }}</p>
+<p><b>Book Name:</b> {{ libdet.bookName }}</p>
+<p><b>Date of issue:</b> {{ libdet.date }}</p>
+
+
+<a href="{% url 'libraryView' %}">🔙 Back to all accounts</a>
+{% endblock %}

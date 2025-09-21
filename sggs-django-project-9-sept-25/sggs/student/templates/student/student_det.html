@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+<h2>Student Details</h2>
+<p><b>Name:</b> {{ studet.name }}</p>
+<p><b>Reg No:</b> {{ studet.regno }}</p>
+<p><b>Branch:</b> {{ studet.branch }}</p>
+<p><b>Year:</b> {{ studet.year }}</p>
+<p><b>CET Score:</b> {{ studet.cet }}</p>
+
+
+<a href="{% url 'studentView' %}">🔙 Back to all accounts</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %}Account Details{% endblock %}
+
+{% block content %}
+<h2>Account Details</h2>
+<p><b>Reg No:</b> {{ accdet.regno }}</p>
+<p><b>Fees Type:</b> {{ accdet.fees_type }}</p>
+<p><b>Amount:</b> {{ accdet.amount }}</p>
+<p><b>Date:</b> {{ accdet.date }}</p>
+
+<a href="{% url 'accountView' %}">🔙 Back to all accounts</a>
+{% endblock %}
