@@ -1,0 +1,506 @@
+🔐 1. Admin Model - Authentication System
+
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String   // bcrypt hashed
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+Features:
+
+✅ Unique username and email constraints
+✅ bcrypt password hashing
+✅ Role-based access control
+✅ Timestamp tracking
+👥 2. Student Model - Core Student Information
+model Student {
+  id                String             @id @default(cuid())
+  studentId         String             @unique
+  name              String
+  email             String             @unique
+  phone             String
+  dateOfBirth       DateTime
+  address           String
+  guardianName      String
+  guardianPhone     String
+  course            String
+  year              Int
+  admissionDate     DateTime
+  profileImage      String?            // Optional profile image URL
+  status            String             @default("active") // active, inactive, graduated
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  // One-to-Many Relations
+  roomAssignment    RoomAssignment?    // One student can have one room assignment
+  attendance        Attendance[]       // Multiple attendance records
+  complaints        Complaint[]        // Multiple complaints
+  leaveApplications LeaveApplication[] // Multiple leave applications
+  emergencyContacts EmergencyContact[] // Multiple emergency contacts
+  feePayments       FeePayment[]       // Multiple fee payments
+  visitorLogs       VisitorLog[]       // Multiple visitor logs
+  maintenanceReqs   MaintenanceRequest[] // Multiple maintenance requests
+}
+Features:
+
+✅ Complete student profile management
+✅ Academic information tracking
+✅ Guardian contact information
+✅ Status management (active/inactive/graduated)
+✅ Relations to all other entities
+🏠 3. Room Model - Room Management
+model Room {
+  id              String           @id @default(cuid())
+  roomNumber      String           @unique
+  floor           Int
+  capacity        Int
+  currentOccupancy Int             @default(0)
+  amenities       String[]         // wifi, ac, balcony, etc. (Array field)
+  status          String           @default("available") // available, occupied, maintenance
+  monthlyRent     Float
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  // Relations
+  assignments     RoomAssignment[] // Multiple assignments over time
+  maintenanceReqs MaintenanceRequest[] // Multiple maintenance requests
+}
+Features:
+
+✅ Room capacity and occupancy tracking
+✅ Amenities as array (wifi, AC, balcony, etc.)
+✅ Status management (available/occupied/maintenance)
+✅ Monthly rent tracking
+🔗 4. RoomAssignment Model - Student-Room Mapping
+model RoomAssignment {
+  id          String    @id @default(cuid())
+  studentId   String    @unique        // One student can have only one active assignment
+  roomId      String
+  assignedAt  DateTime  @default(now())
+  vacatedAt   DateTime?               // Nullable - when student vacates
+  status      String    @default("active") // active, vacated
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations with CASCADE delete
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  room        Room      @relation(fields: [roomId], references: [id])
+}
+Features:
+
+✅ One-to-one mapping between student and room
+✅ Historical tracking with assign/vacate dates
+✅ Cascade deletion for data integrity
+✅ 5. Attendance Model - Daily Attendance Tracking
+model Attendance {
+  id          String   @id @default(cuid())
+  studentId   String
+  date        DateTime
+  checkIn     DateTime?              // Nullable - actual check-in time
+  checkOut    DateTime?              // Nullable - actual check-out time
+  status      String   @default("absent") // present, absent, late, excused
+  remarks     String?                // Optional remarks
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  // Composite unique constraint - one record per student per date
+  @@unique([studentId, date])
+}
+Features:
+
+✅ Daily attendance with check-in/out times
+✅ Multiple status types (present/absent/late/excused)
+✅ Unique constraint prevents duplicate entries per day
+✅ Optional remarks for special cases
+💬 6. Complaint Model - Complaint Management System
+model Complaint {
+  id          String   @id @default(cuid())
+  studentId   String
+  title       String
+  description String
+  category    String   // accommodation, food, maintenance, behavior, other
+  priority    String   @default("medium") // low, medium, high, urgent
+  status      String   @default("pending") // pending, in-progress, resolved, closed
+  response    String?  // Admin response (nullable)
+  resolvedAt  DateTime? // Resolution timestamp (nullable)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+Features:
+
+✅ Categorized complaint system (accommodation/food/maintenance/behavior/other)
+✅ Priority levels (low/medium/high/urgent)
+✅ Complete workflow (pending→in-progress→resolved→closed)
+✅ Admin response system with resolution tracking
+📝 7. LeaveApplication Model - Leave Request System
+model LeaveApplication {
+  id          String   @id @default(cuid())
+  studentId   String
+  reason      String
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("pending") // pending, approved, rejected
+  approvedBy  String?  // Admin who approved (nullable)
+  remarks     String?  // Admin remarks (nullable)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+Features:
+
+✅ Date range validation (start/end dates)
+✅ Approval workflow with admin tracking
+✅ Status management (pending/approved/rejected)
+✅ Admin remarks for approval/rejection reasons
+👤 8. VisitorLog Model - Visitor Tracking System
+model VisitorLog {
+  id          String   @id @default(cuid())
+  studentId   String
+  visitorName String
+  visitorPhone String
+  purpose     String
+  checkIn     DateTime
+  checkOut    DateTime? // Nullable - visitor may still be inside
+  idProof     String   // type of ID proof (passport, license, etc.)
+  idNumber    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+Features:
+
+✅ Complete visitor registration with ID verification
+✅ Check-in/check-out time tracking
+✅ Purpose logging for security
+✅ ID proof verification system
+🔧 9. MaintenanceRequest Model - Maintenance Management
+model MaintenanceRequest {
+  id          String   @id @default(cuid())
+  studentId   String?  // Nullable - can be general maintenance
+  roomId      String?  // Nullable - can be general facility maintenance
+  title       String
+  description String
+  category    String   // electrical, plumbing, cleaning, repair, other
+  priority    String   @default("medium") // low, medium, high, urgent
+  status      String   @default("pending") // pending, in-progress, completed
+  assignedTo  String?  // Staff member assigned (nullable)
+  completedAt DateTime? // Completion timestamp (nullable)
+  cost        Float?   // Maintenance cost (nullable)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations (both optional)
+  student     Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  room        Room?    @relation(fields: [roomId], references: [id])
+}
+Features:
+
+✅ Flexible maintenance system (student-specific or general)
+✅ Category-based organization (electrical/plumbing/cleaning/repair/other)
+✅ Staff assignment and cost tracking
+✅ Priority and status management
+📢 10. Announcement Model - Notice Board System
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  category    String   // general, urgent, event, maintenance, academic
+  priority    String   @default("normal") // normal, high, urgent
+  validFrom   DateTime // Start date for announcement
+  validUntil  DateTime // End date for announcement
+  isActive    Boolean  @default(true)
+  createdBy   String   // Admin who created
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+Features:
+
+✅ Scheduled announcements with validity periods
+✅ Category-based organization (general/urgent/event/maintenance/academic)
+✅ Priority levels for important announcements
+✅ Active/inactive status control
+💰 11. FeePayment Model - Fee Management System
+model FeePayment {
+  id          String   @id @default(cuid())
+  studentId   String
+  amount      Float
+  paymentType String   // room_rent, mess_fee, security_deposit, penalty
+  paymentMode String   // cash, card, upi, bank_transfer
+  month       String   // YYYY-MM format for monthly payments
+  status      String   @default("pending") // pending, paid, overdue
+  dueDate     DateTime
+  paidAt      DateTime? // Payment timestamp (nullable)
+  receiptNo   String?   // Receipt number (nullable)
+  remarks     String?   // Payment remarks (nullable)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+Features:
+
+✅ Multiple payment types (room rent/mess fee/deposits/penalties)
+✅ Various payment modes (cash/card/UPI/bank transfer)
+✅ Monthly tracking with YYYY-MM format
+✅ Status management (pending/paid/overdue)
+✅ Receipt generation and tracking
+🚨 12. EmergencyContact Model - Emergency Contact Management
+model EmergencyContact {
+  id          String   @id @default(cuid())
+  studentId   String
+  name        String
+  relationship String   // parent, sibling, guardian, etc.
+  phone       String
+  email       String?  // Optional email
+  address     String?  // Optional address
+  isPrimary   Boolean  @default(false) // Primary emergency contact flag
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'use client'
+
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Home, AlertCircle, User, Lock } from 'lucide-react'
+
+interface Admin {
+  id: string
+  username: string
+  name: string
+  email: string
+}
+
+interface AdminLoginProps {
+  onLogin: (admin: Admin) => void
+}
+
+export function AdminLogin({ onLogin }: AdminLoginProps): JSX.Element {
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        onLogin(data.admin)
+      } else {
+        setError(data.error || 'Login failed')
+      }
+    } catch (error) {
+      setError('Network error. Please try again.')
+      console.error('Login error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const createDefaultAdmin = async (): Promise<void> => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/admin/create-default', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setError('')
+        alert('Default admin created! Username: admin, Password: admin123')
+      } else {
+        setError(data.error || 'Failed to create admin')
+      }
+    } catch (error) {
+      setError('Network error. Please try again.')
+      console.error('Create admin error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <div className="flex justify-center">
+            <Home className="h-12 w-12 text-blue-600" />
+          </div>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Hostel Management System
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Sign in to access the admin panel
+          </p>
+        </div>
+
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-center">Admin Login</CardTitle>
+            <CardDescription className="text-center">
+              Enter your credentials to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Enter username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 mb-3">
+                Don't have an admin account?
+              </p>
+              <Button
+                variant="outline"
+                onClick={createDefaultAdmin}
+                disabled={loading}
+                className="w-full"
+              >
+                Create Default Admin
+              </Button>
+              <p className="text-xs text-gray-500 mt-2">
+                This will create: username: admin, password: admin123
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+alembic revision --autogenerate -m "describe your change"
+alembic upgrade head
+
+
+
+
+            

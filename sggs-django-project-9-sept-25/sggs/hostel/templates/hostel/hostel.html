@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Hostel Page
+{% endblock %}
+
+{% block content %}
+
+    <h1>Students in Hostel</h1>
+
+    <div class="grid grid-cols-3 gap-4 m-4">
+        {% for a in hostel %}
+        <div class="bg-blue-800 p-5 rounded">
+            <h3>{{a.regno}}</h3>
+
+            <a href="{% url 'hostView' a.id %}">
+                <button type="button">
+                    {{a.hostelName}}
+                </button>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% endblock %}
