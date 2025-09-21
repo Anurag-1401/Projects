@@ -1,35 +1,32 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 from db import engine
 import allModels
 from CRUD import attendanceJob
 from ROUTER import routes
 
+app = FastAPI()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    attendanceJob.start_scheduler()
-    print("App started, scheduler running...")
-    yield
-    print("App shutting down... you can stop scheduler here if needed")
-
-
-app = FastAPI(lifespan=lifespan)
-
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080","https://sggshostel.vercel.app"],
+    allow_origins=["http://localhost:8080", "https://sggshostel.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Create tables if not exists
 allModels.Base.metadata.create_all(bind=engine)
 
+# Include routers
 app.include_router(routes.router)
+
+# Start scheduler on startup
+@app.on_event("startup")
+def startup_event():
+    attendanceJob.start_scheduler()
 
 @app.get('/')
 def index():
-    return {"Welcome to SGGS Hostel Manager System"}
-
+    return {"message": "Welcome to SGGS Hostel Manager System"}
