@@ -4,6 +4,15 @@ from sqlalchemy.orm import Session
 from db import SessionLocal
 from allModels import Attendance, StudentCreate,LeaveApplication
 
+
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+scheduler = BackgroundScheduler()
+
 def mark_absent_job():
     db: Session = SessionLocal()
     try:
@@ -35,11 +44,14 @@ def mark_absent_job():
             new_warning = prev_warning if on_leave_today else prev_warning + 1
 
             if not exists:
+
+                room_no = student.student_details.room_assignment.roomNo if student.student_details and student.student_details.room_assignment else "Unknown"
+
                 absent = Attendance(
                     studentId=student.authen_id,
                     name=student.name,
                     email=student.email,
-                    roomNo=student.student_details.room_assignment.roomNo,
+                    roomNo=room_no,
                     date=date.today(), 
                     status="absent",
                     warning = new_warning
@@ -51,8 +63,19 @@ def mark_absent_job():
     finally:
         db.close()
 
+# def start_scheduler():
+#     scheduler = BackgroundScheduler()
+#     scheduler.add_job(mark_absent_job, "cron", hour=23, minute=59)
+#     scheduler.start()
+#     print("Scheduler started...")
+
+
 def start_scheduler():
-    scheduler = BackgroundScheduler()
+    # For production: run every day at 23:59
     scheduler.add_job(mark_absent_job, "cron", hour=23, minute=59)
+
+    # For testing: uncomment to run every 1 minute
+    # scheduler.add_job(mark_absent_job, "interval", minutes=1)
+
     scheduler.start()
-    print("Scheduler started...")
+    logger.info("Scheduler started.")
