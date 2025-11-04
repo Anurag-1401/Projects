@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from datetime import datetime,date
 from sqlalchemy.orm import Session
-from allModels import Attendance
+from allModels import Attendance,StudentAdded
 from allSchemas import AttendanceCreate
 
 
@@ -39,16 +39,16 @@ def add_attendance(attendance:AttendanceCreate,db:Session):
     current_warning = last_record.warning if last_record else 0
 
     db_attendance = Attendance(
-        roomNo = attendance.roomNo,
-        name=attendance.name,
-        email= attendance.email,
-        location=attendance.location,
-        image=attendance.image,
-        date=attendance.date,
-        studentId=attendance.studentId,
-        status=status,
-        warning = current_warning
-        )
+       roomNo=attendance.roomNo,
+       name=attendance.name or db.query(StudentAdded).filter(StudentAdded.email == attendance.email).first().name,
+       email=attendance.email,
+       location=attendance.location or "Not Provided",
+       image=attendance.image or "Not Available",
+       date=attendance.date,
+       studentId=attendance.studentId,
+       status=status,
+       warning=current_warning,
+    )
 
     db.add(db_attendance)
     db.commit()
