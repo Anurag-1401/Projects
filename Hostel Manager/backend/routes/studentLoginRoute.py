@@ -37,7 +37,7 @@ def login(student:StudentLog,db:Session = Depends(get_db)):
     Student = st_crud.login_Student(db,student)
 
     if not Student:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Account Not Found')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Student Not Found')
     
     return Student
 
