@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,ForeignKey,DateTime,Date,Float,Boolean,ARRAY,Table
+from sqlalchemy import Column,BigInteger,String,ForeignKey,DateTime,Date,Float,Boolean,ARRAY,Table
 from datetime import datetime,timezone
 from db import Base
 from sqlalchemy.orm import relationship
@@ -34,23 +34,23 @@ class AdminLogin(Base):
 class StudentAdded(Base):
     __tablename__ = "StudentAdded"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
     admin_id = Column(String, ForeignKey("AdminCreate.id"), nullable=False)
     name = Column(String)
     Guardian_Name = Column(String)
-    Guardian_Phone = Column(Integer)
+    Guardian_Phone = Column(BigInteger)
     reg_no = Column(String,unique=True)
     email = Column(String, unique=True, index=True)
-    phone = Column(Integer)
+    phone = Column(BigInteger)
     department = Column(String)
-    year = Column(Integer)
+    year = Column(BigInteger)
     DOB = Column(Date)
     Addmission_Date = Column(Date)
     feesDue = Column(Date)
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
-    room_assignment_id = Column(Integer, ForeignKey("room_assignments.id"))
+    room_assignment_id = Column(BigInteger, ForeignKey("room_assignments.id"))
 
     room_assignment = relationship("RoomAssignment", back_populates="students",passive_deletes=True)
 
@@ -62,8 +62,8 @@ class StudentAdded(Base):
 class StudentCreate(Base):
     __tablename__ = "StudentCreate"
 
-    id = Column(Integer, primary_key=True, index=True)
-    authen_id = Column(Integer,ForeignKey("StudentAdded.id"))
+    id = Column(BigInteger, primary_key=True, index=True)
+    authen_id = Column(BigInteger,ForeignKey("StudentAdded.id"))
     name = Column(String)
     email = Column(String, unique=True, index=True)
     role = Column(String, default="student")
@@ -80,8 +80,8 @@ class StudentCreate(Base):
 class StudentLogin(Base):
     __tablename__ = "StudentLogin"
 
-    id = Column(Integer, primary_key=True, index=True)
-    student_id =Column(Integer,ForeignKey("StudentCreate.id"),nullable=False)
+    id = Column(BigInteger, primary_key=True, index=True)
+    student_id =Column(BigInteger,ForeignKey("StudentCreate.id"),nullable=False)
     name = Column(String)
     email = Column(String, nullable=False)
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
@@ -95,10 +95,10 @@ class StudentLogin(Base):
 class Room(Base):
     __tablename__ = "rooms"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     roomNo = Column(String, unique=True, nullable=False)
-    capacity = Column(Integer, nullable=False)
-    occupied = Column(Integer,default=0)
+    capacity = Column(BigInteger, nullable=False)
+    occupied = Column(BigInteger,default=0)
     status = Column(String)
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
@@ -108,11 +108,11 @@ class Room(Base):
 class RoomAssignment(Base):
     __tablename__ = "room_assignments"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     roomNo = Column(String,ForeignKey("rooms.roomNo"))
     assignedBy = Column(String, ForeignKey("AdminCreate.email"))
     assignedDate = Column(DateTime, default=datetime.now(timezone.utc))
-    available = Column(Integer)
+    available = Column(BigInteger)
     allocatedTo = Column(String)
 
     students = relationship("StudentAdded", back_populates="room_assignment",passive_deletes=True)
@@ -123,8 +123,8 @@ class RoomAssignment(Base):
 class Attendance(Base):
     __tablename__ = "attendances"
 
-    id = Column(Integer, primary_key=True)
-    studentId = Column(String, ForeignKey("StudentAdded.id"), nullable=False)
+    id = Column(BigInteger, primary_key=True)
+    studentId = Column(BigInteger, ForeignKey("StudentAdded.id"), nullable=False)
     name=Column(String)
     email=Column(String)
     location=Column(String)
@@ -132,16 +132,16 @@ class Attendance(Base):
     roomNo = Column(String)
     date = Column(DateTime, nullable=False)
     status = Column(String)
-    warning = Column(Integer)
+    warning = Column(BigInteger)
 
 
 
 class Payment(Base):
     __tablename__ = "payments"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     adminId = Column(String,ForeignKey("AdminCreate.email"))
-    studentId = Column(Integer,ForeignKey("StudentAdded.id"))
+    studentId = Column(BigInteger,ForeignKey("StudentAdded.id"))
     studentName = Column(String)
     roomNo = Column(String)
     amount = Column(Float, nullable=False)
@@ -157,7 +157,7 @@ class Payment(Base):
 class Complaint(Base):
     __tablename__ = "complaints"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     student_name = Column(String)
     room_no = Column(String)
     title = Column(String)
@@ -177,7 +177,7 @@ class Complaint(Base):
 class LeaveApplication(Base):
     __tablename__ = "leave_applications"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
     student = Column(String)
     roomNo = Column(String)
     reason = Column(String)
@@ -195,7 +195,7 @@ class LeaveApplication(Base):
 class VisitorLog(Base):
     __tablename__ = "visitor_logs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
     student_email =  Column(String, ForeignKey("StudentCreate.email"))
     student_name = Column(String)
     visitor_name = Column(String)
@@ -210,7 +210,7 @@ class Assistant(Base):
 
     __tablename__ = "assistant"
 
-    id = Column(Integer,primary_key=True,index=True)
+    id = Column(BigInteger,primary_key=True,index=True)
     student = Column(String,ForeignKey('StudentCreate.email'))
     question = Column(String)
     response = Column(String)
