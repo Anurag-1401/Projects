@@ -60,7 +60,7 @@ def login_Student(db:Session,student:StudentLog):
             "id":user.id,
             "student_details": user.student_details,
             "password":student.password,
-            "warning":last_record.warning
+            "warning":last_record.warning if last_record else 0
         }
     
     else:
