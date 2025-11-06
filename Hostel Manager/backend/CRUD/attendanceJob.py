@@ -72,10 +72,10 @@ def mark_absent_job():
 
 def start_scheduler():
     # For production: run every day at 23:59
-    scheduler.add_job(mark_absent_job, "cron", hour=23, minute=59)
+    # scheduler.add_job(mark_absent_job, "cron", hour=23, minute=59)
 
     # For testing: uncomment to run every 1 minute
-    # scheduler.add_job(mark_absent_job, "interval", minutes=1)
+    scheduler.add_job(mark_absent_job, "interval", minutes=2)
 
     scheduler.start()
     logger.info("Scheduler started.")
