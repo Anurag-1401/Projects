@@ -49,8 +49,10 @@ def mark_absent_job():
 
                 absent = Attendance(
                     studentId=student.authen_id,
-                    name=student.name,
+                    name=student.student_details.name,
                     email=student.email,
+                    location=attendance.location or "Not Provided",
+                    image=attendance.image or "Not Available",
                     roomNo=room_no,
                     date=date.today(), 
                     status="absent",
@@ -58,6 +60,7 @@ def mark_absent_job():
                     )
                 db.add(absent)
 
+        
         db.commit()
         print("Attendance auto-marked for missing students.")
     finally:
