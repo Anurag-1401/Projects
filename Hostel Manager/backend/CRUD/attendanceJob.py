@@ -75,7 +75,7 @@ def start_scheduler():
     # scheduler.add_job(mark_absent_job, "cron", hour=23, minute=59)
 
     # For testing: uncomment to run every 1 minute
-    scheduler.add_job(mark_absent_job, "interval",hour=2 minutes=59)
+    scheduler.add_job(mark_absent_job, "interval",hour=1, minutes=30)
 
     scheduler.start()
     logger.info("Scheduler started.")
