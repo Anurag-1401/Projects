@@ -81,10 +81,10 @@ def start_scheduler():
     """Start APScheduler safely (Render-safe)."""
     if not scheduler.running:
         # Run every day at 23:59
-        # scheduler.add_job(mark_absent_job, CronTrigger(hour=23, minute=59))
+        scheduler.add_job(mark_absent_job, CronTrigger(hour=23, minute=59))
 
         # ⏱ For testing only (every 2 mins) — comment out for production
-        scheduler.add_job(mark_absent_job, "interval", minutes=2)
+        # scheduler.add_job(mark_absent_job, "interval", minutes=2)
 
         scheduler.start()
         logger.info("🕒 Scheduler started successfully.")
