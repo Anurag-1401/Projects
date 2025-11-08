@@ -69,7 +69,7 @@ export function AttendanceSystem(): JSX.Element {
   
     let matchesDate = true;
     if (selectedDate) {
-      const attendanceDate = new Date(attend.date).toISOString().split("T")[0];
+      const attendanceDate = new Date(attend.date).toLocaleDateString("en-CA");
       matchesDate = attendanceDate === selectedDate;
     }
   
@@ -78,29 +78,17 @@ export function AttendanceSystem(): JSX.Element {
   
 
 
-const attendanceDates = filteredAttendance.map(a => new Date(a.date));
-
-const firstDate = new Date(Math.min(...attendanceDates.map(d => d.getTime())));
-const lastDate = new Date(Math.max(...attendanceDates.map(d => d.getTime())));
-
-const allDates: string[] = [];
-for (let d = new Date(firstDate); d <= lastDate; d.setDate(d.getDate() + 1)) {
-  allDates.push(d.toISOString().split("T")[0]); 
-}
-
-const recordedDates = new Set(attendanceDates.map(d => d.toISOString().split("T")[0]));
-
-const absentDates = allDates.filter(d => !recordedDates.has(d));
-
 const early = filteredAttendance.filter(a => a.status === "early").length;
 const late = filteredAttendance.filter(a => a.status === "late").length;
+const present = filteredAttendance.filter(a => a.status === "present").length;
+const absent = filteredAttendance.filter(a => a.status === "absent").length;
 
 const stats = {
-  total: filteredAttendance.length + absentDates.length,
+  total: filteredAttendance.length,
   early,
   late,
-  present: filteredAttendance.filter(a => a.status === "present").length + early + late,
-  absent: absentDates.length,
+  present,
+  absent,
 };
 
 
@@ -131,7 +119,7 @@ const exportAttendance = async (): Promise<void> => {
   }
 };
 
-const handleAction = async (id:Number) => {
+const handleAction = async (id:number) => {
   try {
     const response = await axios.put(`${baseURL}/attendance/action-attendance/${id}`)
     if(response.status === 200){
