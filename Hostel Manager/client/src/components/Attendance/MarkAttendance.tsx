@@ -30,21 +30,6 @@ export function AttendanceSystem(): JSX.Element {
   const [error, setError] = useState<string>('')
   const [view,setView] = useState(false)
 
-  
-const attendanceDates = attendance.map(a => new Date(a.date));
-
-  const firstDate = new Date(Math.min(...attendanceDates.map(d => d.getTime())));
-
-  const allDates: string[] = [];
-  for (let d = new Date(firstDate); d < new Date(); d.setDate(d.getDate() + 1)) {
-    allDates.push(d.toISOString().split("T")[0]); 
-  }
-
-  const recordedDates = new Set(attendanceDates.map(d => d.toISOString().split("T")[0]));
-
-  const absentDates = allDates.filter(d => !recordedDates.has(d));
-
-
 
 
   useEffect(() => {
@@ -127,13 +112,15 @@ const filteredAttendance = attendance.filter(attend => {
 
 const early = filteredAttendance.filter(a => a.status === "early").length;
 const late = filteredAttendance.filter(a => a.status === "late").length;
+const present = filteredAttendance.filter(a => a.status === "present").length;
+const absent = filteredAttendance.filter(a => a.status === "absent").length;
 
 const stats = {
-  total: filteredAttendance.length + absentDates.length,
+  total: filteredAttendance.length,
   early,
   late,
-  present: filteredAttendance.filter(a => a.status === "present").length + early + late,
-  absent: absentDates.length,
+  present,
+  absent,
 };
 
   if (loading) {
