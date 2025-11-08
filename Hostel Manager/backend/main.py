@@ -22,9 +22,15 @@ app.add_middleware(
 
 app.include_router(routes.router)
 
+@app.api_route("/health", methods=["GET", "POST", "HEAD"])
+async def health_check(request: Request):
+    return {"status": "ok", "method": request.method}
+    
+
 @app.on_event("startup")
 async def startup_event():
     attendanceJob.start_scheduler()
+    
 
 @app.get('/')
 def index():
