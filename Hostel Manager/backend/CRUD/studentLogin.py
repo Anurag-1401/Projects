@@ -18,6 +18,7 @@ def create_Student(db:Session,student:StudentNew):
             authen_id=authenStudent.id,
             email=student.email,
             password=student.password,
+            name=authenStudent.name
         )
     
         db.add(db_student)
