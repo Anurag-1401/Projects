@@ -8,7 +8,7 @@ def create_Student(db:Session,student:StudentNew):
 
     authenStudent = db.query(StudentAdded).filter(StudentAdded.email == student.email).first()
 
-    if authenStudent:
+    if authenStudent.room_assignment_id is not None:
 
         existing_student = db.query(StudentCreate).filter(StudentCreate.email == student.email).first()
         if existing_student:
@@ -44,7 +44,8 @@ def login_Student(db:Session,student:StudentLog):
 
         db_studentLog = StudentLogin(
             student_id = user.id,
-            email=student.email
+            email=student.email,
+            name=user.name
             )
         
         db.add(db_studentLog)
@@ -85,7 +86,7 @@ def By_google_create(db:Session,student:StudentNew):
 
     authenStudent = db.query(StudentAdded).filter(StudentAdded.email == student.email).first()
 
-    if authenStudent:
+    if authenStudent.room_assignment_id is not None:
 
         existing=db.query(StudentCreate).filter(StudentCreate.email == student.email).first()
         if existing:
