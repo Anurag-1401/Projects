@@ -55,6 +55,28 @@ export function LeaveApplications(): JSX.Element {
     setError('')
     setSuccess('')
 
+    const today = new Date();
+    const startDate = new Date(formData.start_date);
+    const endDate = new Date(formData.end_date);
+  
+    today.setHours(0, 0, 0, 0);
+
+    if (startDate < today) {
+      toast({
+          title:"Start date cannot be earlier than today.",
+          variant:"destructive"
+        })
+
+        return; 
+    } else if(endDate < today){
+      toast({
+          title:"End date cannot be earlier than today.",
+          variant:"destructive"
+        })
+
+        return;
+    }
+
     try {
       const response = await axios.post(`${baseURL}/leave/add-leave`, {...formData,studentId:student?.student_details.id} )
 
