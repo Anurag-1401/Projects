@@ -30,19 +30,15 @@ export const useAgentActions = () => {
     case 'SHOW_ABOUT':
       navigate('/explore');
       setTimeout(() => {
-        requestAnimationFrame(() => {
-          document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-        });
-      }, 100);
-    return null;
+        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+      return null;
 
     case 'SHOW_SKILLS':
       navigate('/explore');
       setTimeout(() => {
-        requestAnimationFrame(() => {
-          document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-        });
-      }, 100);
+        document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
       return null;
 
     case 'OPEN_PROJECT':
@@ -59,10 +55,8 @@ export const useAgentActions = () => {
 
     case 'SCROLL':
       setTimeout(() => {
-        requestAnimationFrame(() => {
-          document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-        });
-      }, 100);
+        document.getElementById(action.section)?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
       return null;
 
     default:
