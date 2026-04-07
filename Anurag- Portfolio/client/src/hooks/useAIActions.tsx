@@ -77,23 +77,35 @@ export const useAgentActions = () => {
   }
 
   // ⚡ SKILLS
-  if (lower.includes('skills') || lower.includes('tech stack') || lower.includes('technologies')) {
+  if (
+    lower.includes('skill') ||
+    lower.includes('tech stack') ||
+    lower.includes('technologies')
+  ) {
     return {
       actions: [{ action: 'SHOW_SKILLS' }],
       message: "Here are my technical skills ⚡"
     };
   }
 
-  // 🚀 PROJECTS
-  if (lower.includes('project') || lower.includes('work') || lower.includes('portfolio')) {
+  // 🚀 PROJECTS (FIXED - correct route)
+  if (
+    lower.includes('project') ||
+    lower.includes('work') ||
+    lower.includes('portfolio')
+  ) {
     return {
       actions: [{ action: 'NAVIGATE', path: '/project' }],
       message: "Let me show you my projects 🚀"
     };
   }
 
-  // 📊 EXPERIENCE
-  if (lower.includes('experience') || lower.includes('internship') || lower.includes('background')) {
+  // 📊 EXPERIENCE (FIXED - multi action)
+  if (
+    lower.includes('experience') ||
+    lower.includes('internship') ||
+    lower.includes('background')
+  ) {
     return {
       actions: [
         { action: 'NAVIGATE', path: '/explore' },
@@ -112,7 +124,11 @@ export const useAgentActions = () => {
   }
 
   // 📞 CONTACT
-  if (lower.includes('contact') || lower.includes('hire') || lower.includes('reach')) {
+  if (
+    lower.includes('contact') ||
+    lower.includes('hire') ||
+    lower.includes('reach')
+  ) {
     return {
       actions: [{ action: 'CONTACT' }],
       message: "Let's connect 🤝"
@@ -127,7 +143,7 @@ export const useAgentActions = () => {
     };
   }
 
-  // 🌙 THEME
+  // 🌙 THEME (FIXED)
   if (lower.includes('dark mode')) {
     return {
       actions: [{ action: 'TOGGLE_THEME', theme: 'dark' }],
@@ -142,11 +158,15 @@ export const useAgentActions = () => {
     };
   }
 
-  // 🤖 RECRUITER MODE (🔥 SMART ADDITION)
+  // 🤖 RECRUITER MODE
   if (lower.includes('recruiter') || lower.includes('hire you')) {
     return {
-      actions: [{ action: 'SHOW_SKILLS' }],
-      message: "Great! Let me walk you through my strongest skills and projects tailored for hiring 🚀"
+      actions: [
+        { action: 'SHOW_SKILLS' },
+        { action: 'NAVIGATE', path: '/project' }
+      ],
+      message:
+        "Great! Let me walk you through my strongest skills and projects tailored for hiring 🚀"
     };
   }
 
