@@ -41,10 +41,8 @@ const handleClick = () => {
           description: `Logged in as ${email}`,
           className: "bg-green-500 text-white",
         });
-
-        console.log(response,response.data.Admin)
         
-      sessionStorage.setItem("adminCreds", JSON.stringify({ Email: email, Password: password }));
+      sessionStorage.setItem("adminCreds", JSON.stringify({ Email: email}));
 
       navigate("/admin-profile", { replace: true});
 
@@ -149,7 +147,7 @@ const handleClick = () => {
 
         { pass &&
           <div className='flex gap-4'>
-        <Input type="text" placeholder="password" onChange={e => setPassword(e.target.value)} onKeyDown={handleKey} className="bg-white/10 text-white border-white/20" />
+        <Input type="password" placeholder="password" onChange={e => setPassword(e.target.value)} onKeyDown={handleKey} className="bg-white/10 text-white border-white/20" />
         <Button onClick={handleLogin} className="w-full bg-blue-500 hover:bg-blue-600 text-white">Login with Email</Button>
         </div>
         }
@@ -157,7 +155,7 @@ const handleClick = () => {
       </div>
 
         <button
-          onClick={()=>{handleForgotPassword
+          onClick={()=>{handleForgotPassword();
             setF(true)
           }}
           className="mt-5  w-full mt-3 text-sm text-blue-600 hover:underline"

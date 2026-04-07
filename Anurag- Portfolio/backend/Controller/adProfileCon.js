@@ -3,7 +3,7 @@ const Admin = require('../Models/adminModel');
 
 const admin = async (req , res)=> {
     const {name , email , contact , profession, description , location , github,
-        linkedin ,  insta ,features,facts,about,journey
+        linkedin ,  insta ,features,facts,about,journey,profilePic
     } = req.body;
 
     try {
@@ -23,13 +23,14 @@ const admin = async (req , res)=> {
             admin.github = github;
             admin.linkedin = linkedin;
             admin.insta = insta;
+            admin.profilePic = profilePic;
 
             await admin.save();
             return res.status(201).json({message : "Details Updated" , data:admin})
         }
 
         const newAdmin = new Admin({name , email , contact , profession, description , location,
-            github , linkedin , insta, features, facts, about, journey
+            github , linkedin , insta, features, facts, about, journey, profilePic
         })
 
         await newAdmin.save();

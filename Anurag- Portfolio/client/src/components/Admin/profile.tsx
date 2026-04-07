@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Pencil,Save,Plus,Trash2} from 'lucide-react';
+import { Pencil,Save,Plus,Trash2,XSquareIcon} from 'lucide-react';
 import axios from 'axios';
 import party from 'party-js'
 
@@ -68,12 +68,52 @@ const handleClick = () => {
         setProfileData(response.data.Admin)
         setFacts(response.data.Admin.facts.map(t=>({fact:t})))
         setFields(response.data.Admin.features)
-        console.log(response.data.Admin)
       }
     } catch (error) {
-      
+      console.error('Error fetching admin details:', error);
     }
   };
+
+  const MAX_SIZE = 2 * 1024 * 1024;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+  toast({
+    title: "Invalid file",
+    description: "Only image files are allowed",
+    variant: "destructive",
+  });
+  return;
+}
+
+  if (file.size > MAX_SIZE) {
+    toast({
+      title: "Image too large",
+      description: "Please upload an image smaller than 2MB",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  const reader = new FileReader();
+
+   reader.onloadend = () => {
+    if (typeof reader.result === "string") {
+      setProfileData((prev) => ({
+        ...prev,
+        profilePic: reader.result as string,
+      }));
+    }
+  };
+
+  reader.readAsDataURL(file);
+
+  e.target.value = "";
+};
 
   
   const [profileData, setProfileData] = useState({
@@ -89,19 +129,20 @@ const handleClick = () => {
     location: '',
     github: '',
     linkedin: '',
-    insta: ''
+    insta: '',
+    profilePic:''
   });
 
   const handleProfileUpdate = async () => {
 
-    const data =  {
+    const data = {
       ...profileData,
-      features:fields,
-      facts:facts.map(t=>t.fact)
-    }
+      features: fields,
+      facts: facts.map(t => t.fact),
+    };
 
     try {
-      const response = await axios.post(`${baseUrl}/api/admin` , data)
+      const response = await axios.post(`${baseUrl}/api/admin` , data);
         if (response.status == 201) {
           toast({
             title: "Profile Updated",
@@ -142,7 +183,8 @@ const handleClick = () => {
     location: '',
     github: '',
     linkedin: '',
-    insta: ''
+    insta: '',
+    profilePic:''
   })
   
 };
@@ -166,9 +208,6 @@ return(
                 onClick={() => { 
                   setisEdit(prev => !prev);
                   fetchAdmin();
-                  {false && setTimeout(() => {
-                    window.location.reload()
-                  }, 500);}
                 }
                 }
                 className={`border ${
@@ -342,7 +381,7 @@ return(
 
           </div>
 
-
+            <p className="text-white/80 text-md font-medium mb-2 block">Socials</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -404,7 +443,41 @@ return(
                       className="bg-white/10 border-white/20 text-white"
                     />
                   </div>
+
+                  <div>
+                    <label className="text-white/80 text-sm font-medium mb-2 block">Profile Picture</label>
+                   <Input
+                  type="file"
+                  disabled={!isEdit}
+                  onChange={handleFileChange}
+                  className="bg-white/10 border-white/20 text-white"
+                />
+                  </div>
                 </div>
+                 <div>
+                    {profileData.profilePic && (
+                    <div className="relative w-64 h-64 rounded-xl overflow-hidden border border-white/20 bg-white/5">
+                      <img
+                        src={profileData.profilePic}
+                        alt="Preview"
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      />
+                    <button
+                    disabled={!isEdit}
+                       type="button"
+                       onClick={() =>
+                         setProfileData((prev) => ({
+                           ...prev,
+                           profilePic: "",
+                         }))
+                       }
+                       className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md shadow-md pointer:cursor"
+                     >
+                        <XSquareIcon className="w-3 h-3" />
+                     </button>
+                    </div>
+                  )}
+                  </div>
 
                 <Button  id="confettiBtn"
                   disabled={!isEdit}

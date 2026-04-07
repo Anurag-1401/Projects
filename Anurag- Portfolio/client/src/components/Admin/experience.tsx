@@ -268,9 +268,11 @@ const handleClick = () => {
           size="sm"
           onClick={() => { 
             setisEdit(prev => !prev);
-            {isEdit && setTimeout(() => {
-              window.location.reload();
-            }, 500);}
+            if (isEdit) {
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+            }
           }
           }
           className={`border ${
@@ -332,7 +334,7 @@ const handleClick = () => {
               value={newExperience.period[1] || ""}
               onChange={(e) => setNewExperience({...newExperience, period:[newExperience.period[0]||"",e.target.value]})}
               className="ml-5 ml-10 bg-white/10 border-white/20 text-white w-[172px]"
-              placeholder='mm/dd/yyyy or Present'
+              placeholder='yyyy-mm-dd or Present'
             />
             </div>
           </div>
@@ -428,7 +430,12 @@ const handleClick = () => {
             
             {newExperience.description.length>10 && <div className="flex gap-2">
             <Button  id="confettiBtn"
-              onClick={() => {isEdit1 ? handleUpdateExperience(editP.toString()) : handleAddExperince();
+              onClick={() => {
+                if (isEdit1) {
+                  handleUpdateExperience(editP.toString());
+                } else {
+                  handleAddExperince();
+                }
               }}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 flex-1"
             >

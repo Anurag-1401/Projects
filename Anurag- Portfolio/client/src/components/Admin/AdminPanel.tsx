@@ -10,7 +10,7 @@ import { Experience, Profile ,Projects, Skills} from '../Admin'
 const AdminPanel = () => {
 
   const [activeTab, setActiveTab] = useState(() => {
-return sessionStorage.getItem("activeTab");
+return sessionStorage.getItem("activeTab") || "profile";
 
 });
 

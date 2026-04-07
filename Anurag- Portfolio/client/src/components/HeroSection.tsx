@@ -3,55 +3,74 @@ import { useEffect, useState,ComponentProps, useRef, Children  } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Github, Linkedin, Mail ,Goal,Instagram} from 'lucide-react';
-import Profile from './img/image.png'
+import Profile from './img/image_c971d662.png'
 import { auth } from '../firebase/config';
 import { onAuthStateChanged,signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
-
+import axios from 'axios'
+import { storeToken } from '@/utils/authToken';
 
 const HeroSection = () => {
 
   const  navigate = useNavigate()
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-const [isLoggedIn, setIsLoggedIn] = useState(false);
-const email = "bhavthankaranurag@gmail.com";
+ const [profileData, setProfileData] = useState({
+    email: '',
+    contact: '',
+    location: '',
+    github: '',
+    linkedin: '',
+    insta: '',
+    profilePic: '',
+  });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async(user) => {
       setIsLoggedIn(!!user);
+      if (user) {
+      await storeToken();
+    }
     });
 
     return () => unsubscribe(); 
   }, []);
 
 
+    useEffect(()=>{
+      fetchAdmin();
+    },[])
+  
+    const fetchAdmin = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/api/getAdminDetails`)
+        if (response.status == 200) {
+          setProfileData(response.data.Admin)
+        }
+      } catch (error) {
+        console.error('Error fetching admin details:', error);
+      }
+    };
+
+
   const handleLogout = () => {
     signOut(auth)
-      .then(() => {console.log("User logged out");
+      .then(() => {
          toast({
                 title: "Logout Successful",
                 description: `Visit Again`,
               });
     navigate("/", { replace: true });
-
+    sessionStorage.removeItem("token");
       })
       .catch(err => console.error("Logout error:", err));
   };
 
 
   const handleClick = (targetPath: string) => {
-    const user = auth.currentUser;
-    if (user) {
       navigate(targetPath);
-    } else {
-      toast({
-        title: "You have to login first",
-        description: "Access denied!",
-        className: "bg-red-500 text-white",
-      });
-      navigate("/login", { state: { from: targetPath } });
-    }
   };
 
 
@@ -67,7 +86,11 @@ const email = "bhavthankaranurag@gmail.com";
 
       <div className="ml-5 w-64 h-[450px] sm:w-64 sm:h-75 md:w-80 md:h-85 mb-5 mt-10 md:mb-20 relative -top-[20px] md:-top-[50px] 
       overflow-hidden shadow-lg  hover:scale-110 transition-transform duration-300 border p-2">
-      <img src={Profile} className="w-full h-full object-cover" alt="" />
+        {
+          profileData.profilePic && (
+            <img src={profileData.profilePic || Profile} className="w-full h-full object-cover" alt="Profile" />
+          )
+        }
       </div>
 
     <section id="home" className="flex flex-col items-center justify-center relative overflow-hidden">
@@ -149,16 +172,16 @@ const email = "bhavthankaranurag@gmail.com";
             transition={{ duration: 0.8, delay: 0.8 }}
             className="flex flex-wrap justify-center space-x-6 mt-6 sm:mt-0"
             >
-            <a href="https://github.com/Anurag-1401" target="_blank" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
+            <a href={profileData.github} target="_blank" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
               <Github className="w-6 h-6" />
             </a>
-            <a href="https://www.linkedin.com/in/anurag-bhavthankar/" target="main" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
+            <a href={profileData.linkedin} target="main" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
               <Linkedin className="w-6 h-6" />
             </a>
-            <a href={`mailto:${email}`} className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
+            <a href={`mailto:${profileData.email}`} className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
               <Mail className="w-6 h-6" />
             </a>
-            <a href="https://www.instagram.com/anurag_07_03/" target="main" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
+            <a href={profileData.insta} target="main" className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110">
               <Instagram className="w-6 h-6" />
             </a>
             

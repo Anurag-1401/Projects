@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, Home } from 'lucide-react';
 import { useState ,useEffect} from 'react';
 import axios from 'axios';
+import { auth } from '../firebase/config';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,7 +26,6 @@ const ProjectsSection = () => {
 
   const fetchProjects = async () => {
     try {
-     console.log(baseUrl);
         const response = await axios.get(`${baseUrl}/api/get-projects`);
          if(response.status == 200){
            setProjects(response.data.project)
@@ -41,6 +41,22 @@ const ProjectsSection = () => {
       });
     }
   };
+
+  const handleExternalLink = (url: string) => {
+  const user = auth.currentUser;
+
+  if (user) {
+    window.open(url, "_blank");
+  } else {
+    toast({
+      title: "You have to login first",
+      description: "Access denied!",
+      className: "bg-red-500 text-white",
+    });
+
+    navigate("/login", { state: { from: url } ,replace:true});
+  }
+};
 
   
   const featuredProjects = projects.filter(project => project.featured);
@@ -124,16 +140,15 @@ const ProjectsSection = () => {
                     </Button>
                     </a>
 
-                    <a href={project.github} target='main'>
                     <Button
                       variant="outline"
                       size="sm"
                       className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10"
+                      onClick={() => handleExternalLink(project.github)}
                     >
                       <Github className="w-4 h-4 mr-2" />
                       Code
                     </Button>
-                    </a>
 
                   </div>
                 </CardContent>
@@ -164,15 +179,20 @@ const ProjectsSection = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 transform hover:scale-105 h-320px] md:h-[260px] md:w-[440px]">
-              <CardHeader>
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm 
+                 hover:bg-white/10 transition-all duration-300 
+                 transform hover:scale-105 
+                 min-h-[260px] md:w-[440px] flex flex-col justify-between">
+                  
+               <CardHeader>
                   <CardTitle className="text-white text-xl mb-5">{project.title}</CardTitle>
                   <CardDescription className="text-white/70 text-md">
                     {project.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-1 mb-7">
+                <CardContent className="flex flex-col justify-between flex-1">
+                  <div>
+                  <div className="flex flex-wrap gap-1 mb-4">
                     {project.technologies.slice(0, 3).map((tech, techIndex) => (
                       <Badge 
                         key={techIndex}
@@ -188,27 +208,28 @@ const ProjectsSection = () => {
                       </Badge>
                     )}
                   </div>
+                  </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-3 mt-auto">
                     <a href={project.demo} target='main' className='mr-3'>
                     <Button
                       size="sm"
                       className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
                     >
-                      <ExternalLink className="w-4 h-4 mr-" />
+                      <ExternalLink className="w-4 h-4 mr-2" />
                       Live Demo
                     </Button>
                     </a>
 
-                    <a href={project.github} className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10 flex-1" target='main'>
                     <Button
-                      size="sm"
                       variant="outline"
-                      >
-                      <Github className="w-3 h-3 mr-1" />
+                      size="sm"
+                      className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10"
+                      onClick={() => handleExternalLink(project.github)}
+                    >
+                      <Github className="w-4 h-4 mr-2" />
                       Code
                     </Button>
-                    </a>
 
                   </div>
                 </CardContent>

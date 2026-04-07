@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route ,RouterProvider} from "react-router-dom";
 import HeroSection from '@/components/HeroSection';
 import ProjectsSection from '@/components/ProjectsSection';
 import ContactSection from '@/components/ContactSection';
-import PrivateRoute from './components/privateRoute';
 import Login from './components/login'
 import ProtectedAdminRoute from "./components/Admin/AdminAuth/protectedAdminRoute";
 import AdminAccessGate from "./components/Admin/AdminAuth/AdminAccessGate";
@@ -15,6 +14,7 @@ import AdminLogin from "./components/Admin/AdminAuth/AdminLogin";
 import AdminDetails from "./components/Admin/adminDetails";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AIAgent from "./components/ai/AIAgent";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +24,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AIAgent />
+      
         <Routes>
           
           <Route path="/" element={<HeroSection />} />
@@ -51,17 +53,11 @@ const App = () => (
           
 
           
-          <Route path="/explore" element={
-            <PrivateRoute> <Index access={false} /> </PrivateRoute>
-          }/>
+          <Route path="/explore" element={<Index access={false} />}/>
 
-          <Route path="/project" element={
-          <PrivateRoute> <ProjectsSection />  </PrivateRoute> 
-          } />
+          <Route path="/project" element={<ProjectsSection />} />
           
-          <Route path="/contact" element={
-          <PrivateRoute> <ContactSection /> </PrivateRoute>
-          } />
+          <Route path="/contact" element={<ContactSection />} />
 
           <Route path="*" element={<NotFound />} />
           

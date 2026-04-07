@@ -9,16 +9,15 @@ import party  from 'party-js';
 
 const AdminDetails = () => {
 
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
   const [credentials, setCredentials] = useState({email: '',password: ''});  
-      const [rePassword, setrePassword] = useState("");
-      const [conP, setConP] = useState("");
-      const [f,setF] = useState(false);
-      const [visitor,setVisitor] = useState([]);
+  const [rePassword, setrePassword] = useState("");
+  const [conP, setConP] = useState("");
+  const [f,setF] = useState(false);
+  const [visitor,setVisitor] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
 
-const handleClick = () => {
-
-    const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
-  
+const handleClick = () => {  
       const btn = document.getElementById('confettiBtn');
       if (btn) {
         party.confetti(btn, {
@@ -42,26 +41,23 @@ const fetchVisitors = async () => {
 
         if(response.status === 200){
             setVisitor(response.data.Visitors);
-            console.log(response.data.Visitors);
-
         }
     } catch (error) {
         console.log(error);
     }
 };
 
-const fetchAdmin = async () => {
-  try {
-    const response = await axios.get(`${baseUrl}/api/get-admin/1`);
-    if (response.status === 200) {
-      credentials.email = response.data.Admin.email;
-      credentials.password = response.data.Admin.password;
-      console.log("credentials",credentials)
-    } 
-} catch (error){
-
-}
-};
+  const fetchAdmin = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/get-admin/1`);
+      if (response.status === 200) {
+        credentials.email = response.data.Admin.email;
+        credentials.password = response.data.Admin.password;
+      } 
+  } catch (error){
+    console.log(error);
+  }
+  };
 
 const handleForgotPassword = async () => {
         if (!credentials.email) {
@@ -120,68 +116,110 @@ const handleForgotPassword = async () => {
 return(
     <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 pt-10">
 
-<div className="ml-10 bg-black/10 shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-md">
-    <div className="space-y-4 bg-white/5 p-4 sm:p-6 rounded-xl border border-white/10 backdrop-blur">
-      <Input
-        type="email"
-        placeholder="Email"
-        value={credentials.email}
-        disabled={true}
-        className="bg-white/10 text-white border-white/20"
-      />
-      <Input
-        type="text"
-        placeholder="Password"
-        value={credentials.password}
-        disabled={true}
-        className="bg-white/10 text-white border-white/20"
-      />
-    </div>
+      <div className='mb-10 px-4 md:px-10'>
+    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+      Your Following and password details
+    </h1>
+  </div>
 
-    <button
-      onClick={() => setF(p=>!p)}
-      className="w-full mt-4 text-sm text-blue-600 hover:underline"
-    >
-      {f ? 'cancel':'Change Password'}
-    </button>
+<Card className="mt-20 bg-white/5 border-white/10 backdrop-blur-sm 
+                 w-full max-w-2xl ml-4 sm:ml-6 md:ml-10">
+  
+  <CardHeader>
+    <CardTitle>
+      <h1 className="text-lg sm:text-xl font-bold 
+                     bg-gradient-to-r from-blue-400 to-purple-400 
+                     bg-clip-text text-transparent">
+        Manage Password
+      </h1>
+    </CardTitle>
+  </CardHeader>
 
-    {f && (
-      <>
+  <CardContent>
+    
+    <div className="bg-black/10 shadow-lg rounded-xl 
+                    p-4 sm:p-6 w-full max-w-xl">
+
+      <div className="space-y-4 bg-white/5 p-4 sm:p-6 
+                      rounded-xl border border-white/10 backdrop-blur">
+
+        {/* Email */}
         <Input
-          type="password"
-          placeholder="Enter new password"
-          onChange={(e) => setrePassword(e.target.value)}
-          className="mt-4 bg-white/10 text-white border-white/20"
+          type="email"
+          value={credentials.email}
+          disabled
+          className="bg-white/10 text-white border-white/20"
         />
-        {rePassword && (
-          <>
+
+        {/* Password */}
+        <div className="relative">
+          <Input
+            type={showPassword ? "text" : "password"}
+            value={credentials.password}
+            disabled
+            className="bg-white/10 text-white border-white/20 pr-10"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 
+                       text-white/60 hover:text-white text-xs"
+          >
+            {showPassword ? "Hide" : "View"}
+          </button>
+        </div>
+
+      </div>
+
+      {/* Change Password */}
+      <button
+        onClick={() => setF(p => !p)}
+        className="w-full mt-4 text-sm text-blue-400 hover:underline text-left"
+      >
+        {f ? 'Cancel' : 'Change Password'}
+      </button>
+
+      {f && (
+        <div className="mt-4 space-y-4">
+          <Input
+            type="password"
+            placeholder="Enter new password"
+            onChange={(e) => setrePassword(e.target.value)}
+            className="bg-white/10 text-white border-white/20"
+          />
+
+          {rePassword && (
             <Input
               type="password"
               placeholder="Confirm password"
               onChange={(e) => setConP(e.target.value)}
-              className="mt-4 bg-white/10 text-white border-white/20"
+              className="bg-white/10 text-white border-white/20"
             />
-            {conP && (
-              <Button  id="confettiBtn"
-                onClick={()=>{handleForgotPassword();
-                }}
-                className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Update
-              </Button>
-            )}
-          </>
-        )}
-      </>
-    )}
-  </div>
+          )}
 
-   
+          {rePassword && conP && (
+            <Button
+              onClick={handleForgotPassword}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              Update
+            </Button>
+          )}
+        </div>
+      )}
+
+    </div>
+
+  </CardContent>
+</Card>
 
     <Card className="mt-20 bg-white/5 border-white/10 backdrop-blur-sm mx-4 md:mx-10">
     <CardHeader>
         <CardTitle>
-        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <h1 className="text-lg sm:text-xl font-bold 
+                     bg-gradient-to-r from-blue-400 to-purple-400 
+                     bg-clip-text text-transparent">
           Who Visit Your Portfolio
         </h1>
         </CardTitle>

@@ -14,7 +14,8 @@ const adminSchema = mongoose.Schema({
     features:[{title:String,value:String,icon:String}],
     github : {type:String , require:true},
     linkedin : {type:String , require:true},
-    insta : {type:String , require:true}
+    insta : {type:String , require:true},
+    profilePic : {type:String , require:true},
 },
     {timestamps : true} 
 );

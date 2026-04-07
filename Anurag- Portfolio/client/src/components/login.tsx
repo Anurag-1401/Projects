@@ -9,14 +9,14 @@ import { FcGoogle } from 'react-icons/fc';
 import { Github } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { storeToken } from "../utils/authToken.js";
 
 
 
 declare global {
   interface Window {
     recaptchaVerifier: RecaptchaVerifier;
-    confirmResult: any;
+    confirmResult;
   }
 };
 
@@ -32,12 +32,16 @@ declare global {
 
 export default function Login() {
 
-   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
+  const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
-const navigate = useNavigate();
-const location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-const redirectPath = location.state?.from || "/";
+  const isExternal = (url: string) => {
+    return /^https?:\/\//i.test(url);
+  };
+
+  const redirectPath = location.state?.from?.trim() || "/";
 
 
   const [email, setEmail] = useState('');
@@ -53,93 +57,116 @@ const redirectPath = location.state?.from || "/";
 
 
   const sendTokenToBackend = async () => {
-    const idToken = await auth.currentUser.getIdToken();
-    fetch(`${baseUrl}/api/profile`, {
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("No authenticated user found");
+      return;
+    }
+
+    const idToken = await user.getIdToken(true);
+
+    const response = await fetch(`${baseUrl}/api/profile`, {
+      method: "GET",
       headers: {
         Authorization: `Bearer ${idToken}`,
+        "Content-Type": "application/json",
       },
-    })
-      .then(res => res.json())
-      .then(data => console.log('Backend response:', data))
-      .catch(err => console.error('Backend error:', err));
-  };
+    });
 
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Request failed");
+    }
 
-
+    const data = await response.json();
+  } catch (err) {
+    console.error("❌ Backend error:", err.message);
+  }
+};
 
   const loginEmail = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      await storeToken();
+
       const user = userCredential.user;
 
        await sendTokenToBackend(); 
-
-       navigate(redirectPath, { replace: true });
-      
-
-      const userData = {
-        email: user.email,
-        name: user.displayName,
-        uid: user.uid,
-        photo: user.photoURL,
-      };
-
-      const response = await axios.post(`${baseUrl}/api/user`,userData)
-      if(response.status === 201){
-        console.log(response)
-      };
-
-      console.log("✅ Logged In:", user.email);
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${user.email}`,
-      });
-  
-    } catch (error: any) {
-      if (error.code === "auth/user-not-found") {
-        try {
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const newUser = userCredential.user;
-
-          await sendTokenToBackend(); 
-
-           navigate(redirectPath, { replace: true });
-  
-          console.log("✅ New User Registered:", newUser.email);
-          toast({
-            title: "Signup Successful",
-            description: `Account created for ${newUser.email}`,
-          });
-  
-    } catch (signupError: any) {
-          console.error("❌ Signup Error:", signupError);
-          toast({
-            title: "Signup Failed",
-            description: signupError.message,
-            variant: "destructive",
-          });
-        }
-  
-      } else if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
-        toast({
-          title: "Login Failed",
-          description: "Incorrect email or password",
-          variant: "destructive",
-        });
-      } else if (error.code === "auth/network-request-failed") {
-        toast({
-          title: "Network Error",
-          description: "Check your internet connection",
-          variant: "destructive",
-        });
+       
+      if (isExternal(redirectPath)) {
+        window.open(redirectPath, "_blank");
+        navigate("/", { replace: true });
       } else {
-        console.error("❌ Login Error:", error);
+        navigate(redirectPath, { replace: true });
+      }
+
+    toast({
+      title: "Login Successful",
+      description: `Welcome back, ${user.email}`,
+    });
+
+  
+    } catch (error) {
+      if (
+      error.code === "auth/user-not-found" ||
+      error.code === "auth/invalid-credential"
+    ) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+        await storeToken();
+
+        const newUser = userCredential.user;
+
+        await sendTokenToBackend();
+        
+        if (isExternal(redirectPath)) {
+          window.open(redirectPath, "_blank");
+          navigate("/", { replace: true });
+        } else {
+          navigate(redirectPath, { replace: true });
+        }
+
+        await axios.post(`${baseUrl}/api/user`, {
+          email: newUser.email,
+          name: newUser.displayName,
+          uid: newUser.uid,
+          photo: newUser.photoURL,
+        });
+
         toast({
-          title: "Login Failed",
-          description: error.message,
+          title: "Signup Successful",
+          description: `Account created for ${newUser.email}`,
+        });
+
+      } catch (signupError) {
+        toast({
+          title: "Signup Failed",
+          description: signupError.message,
           variant: "destructive",
         });
       }
+
+    } 
+    
+    else if (error.code === "auth/wrong-password") {
+      toast({
+        title: "Login Failed",
+        description: "Incorrect password",
+        variant: "destructive",
+      });
+    }
+
+    else {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
     }
   };
   
@@ -178,11 +205,17 @@ const redirectPath = location.state?.from || "/";
   
     try {
       const res = await signInWithPopup(auth, googleProvider);
-      console.log("Google Sign-in", res.user);
+
+      await storeToken();
   
       await sendTokenToBackend(); 
-
-      navigate(redirectPath, { replace: true });
+      
+      if (isExternal(redirectPath)) {
+        window.open(redirectPath, "_blank");
+        navigate("/", { replace: true });
+      } else {
+        navigate(redirectPath, { replace: true });
+      }
   
       const userData = {
         email: res.user.email,
@@ -213,10 +246,17 @@ const redirectPath = location.state?.from || "/";
 
     signInWithPopup(auth, githubProvider)
       .then(async res => {
-        console.log("GitHub Sign-in", res.user);
-        await sendTokenToBackend(); 
 
+        await storeToken();
+
+        await sendTokenToBackend(); 
+        
+      if (isExternal(redirectPath)) {
+        window.open(redirectPath, "_blank");
+        navigate("/", { replace: true });
+      } else {
         navigate(redirectPath, { replace: true });
+      }
 
         const userData = {
           email: res.user.email,
@@ -248,7 +288,7 @@ const redirectPath = location.state?.from || "/";
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
         size: "invisible",
-        callback: (response: any) => {
+        callback: (response) => {
           console.log("reCAPTCHA solved", response);
         },
         "expired-callback": () => {
@@ -324,9 +364,9 @@ const appVerifier = window.recaptchaVerifier;
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 p-6">
     <div className="grid grid-cols-1 md:grid-cols-1 gap-3 w-[450px]">
-      <h2 className="text-3xl font-bold text-center text-white">Login</h2>
+      <h2 className="text-3xl font-bold text-center text-white mb-5">Connect</h2>
 
-      <div className="space-y-4 bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur">
+      {/* <div className="space-y-4 bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur">
         <div className='flex gap-4'>
         <Input type="tel" placeholder="Currently Unavailable" value={phone} disabled={true} onChange={e => setPhone(e.target.value)} 
         className="bg-white border-white/20 text-white" />
@@ -341,7 +381,7 @@ const appVerifier = window.recaptchaVerifier;
         <div id="recaptcha"></div>
       </div>
 
-      <p className='text-white text-center'>OR</p>
+      <p className='text-white text-center'>OR</p> */}
 
       <div className="space-y-4 bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur ">
         <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="bg-white/10 text-white border-white/20" />

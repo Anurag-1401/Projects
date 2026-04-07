@@ -22,12 +22,10 @@ const AdminAccessGate = () => {
       const response = await axios.get(`${baseUrl}/api/get-admin/1`);
       if (response.status === 200) {
         navigate("/admin-login",{replace:true});
-        console.log(response,response.data.Admin)
       } else {
         navigate("/admin-register",{replace:true});
-        console.log(response)
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error checking admin existence:", error);
 
       if (error.response && error.response.status === 404) {

@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Instagram,Home } from 'lucide-react';
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase/config';
+import { replace, useNavigate } from 'react-router-dom';
 import party from 'party-js'
 
 
@@ -72,12 +73,23 @@ const handleClick = () => {
       return;
     }
 
+    const user = auth.currentUser;
+    
+      if (!user) {
+        toast({
+          title: "You have to login first",
+          description: "Access denied!",
+          className: "bg-red-500 text-white",
+        });
+    
+        return navigate("/login", { state:{from:'/contact'} });
+      }
+
     try {
     const response = await axios.post(`${baseUrl}/api/send-mail`, formData)
       if(response.status == 201){
 
       handleClick();
-      console.log(response.data.message);
     toast({
       title: "Message sent!",
       description: "Thank you for your message. I'll get back to you soon.",
@@ -117,13 +129,12 @@ const handleClick = () => {
 
   const fetchAdmin = async () => {
     try {
-      const response = await axios.get(`${baseUrl}http://localhost:5000/api/getAdminDetails`)
+      const response = await axios.get(`${baseUrl}/api/getAdminDetails`)
       if (response.status == 200) {
         setProfileData(response.data.Admin)
-        console.log(response)
       }
     } catch (error) {
-      
+      console.error('Error fetching admin details:', error);
     }
   };
 

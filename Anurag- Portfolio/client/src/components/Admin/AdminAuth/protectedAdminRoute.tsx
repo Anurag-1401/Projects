@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 const ProtectedAdminRoute = ({ children }) => {
   const admin = JSON.parse(sessionStorage.getItem("adminCreds")); 
 
-  if (!admin || !admin.Email || !admin.Password) {
+  if (!admin || !admin.Email) {
     return <Navigate to="/admin-login" replace />;
   }
 
