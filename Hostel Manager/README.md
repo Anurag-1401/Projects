@@ -1,71 +1,60 @@
-🏨 Anurag's Hostel Manager – Smart Hostel Management System
+# 🏨 Anurag's Hostel Manager – Smart Hostel Management System
 
-📌 Project Description
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Status](https://img.shields.io/badge/status-Active-success)
+![Built With](https://img.shields.io/badge/stack-MERN%20%2B%20FastAPI-ff69b4)
+![Responsive](https://img.shields.io/badge/Responsive-Yes-brightgreen)
 
-Hostel Manager is a smart hostel management system designed to streamline and automate hostel operations such as student management, room allocation, attendance tracking, and communication.
+---
 
-Built using a modern full-stack architecture, this system replaces traditional manual processes with an efficient, secure, and scalable digital solution.
+## 📌 Project Description
 
-🚀 The latest upgrade introduces a network-based attendance system that detects students using their device MAC / network presence, eliminating the need for cameras or face recognition.
+This is my **Hostel Manager Application** built using a **modern full-stack architecture** with **MERN + TypeScript + FastAPI**. It is designed to digitize and simplify hostel operations such as student management, room allocation, attendance tracking, and communication.
 
-🔗 Live Application
+The system replaces manual processes with an efficient, scalable, and secure solution. It also includes a **Smart Network-Based Attendance System** that works using **device MAC / network detection**, removing the need for cameras or biometric systems.
+
+---
+
+## 🔗 Live Application
 
 🌐 https://sggshostel.vercel.app
 
-🧩 Features
-👨‍🎓 Student Management
-Add, update, and delete student records
-Store detailed student information (name, room, contact, etc.)
-Track student activity and status
-🛏️ Room Allocation System
-Assign rooms dynamically to students
-Manage room capacity and availability
-Automatic updates on room occupancy
-📡 Smart Attendance System (Network-Based)
-Attendance marked using WiFi / network detection
-Identifies students via:
-Device MAC address
-Network IP scanning
-Works across multiple routers in hostel environment
-No camera / biometric required ✅
-Efficient for large-scale hostels with multiple access points
-🔐 Authentication & Security
-Secure login system (Admin-controlled access)
-Role-based navigation (Admin vs User)
-Protected routes for sensitive operations
-🧑‍💼 Admin Dashboard
-Manage students, rooms, and attendance
-View real-time data and updates
-Update records without touching database manually
-💬 Real-Time Chat System
-Built-in communication between:
-Students ↔ Admin
-Useful for:
-Complaints
-Announcements
-General communication
-Improves hostel coordination and response time
-📊 Data Management
-Structured database for:
-Students
-Rooms
-Attendance logs
-Efficient querying and updates
-📱 Fully Responsive UI
-Works seamlessly on:
-Mobile 📱
-Tablet 💻
-Desktop 🖥️
-🛠️ Tech Stack
-Tech	Purpose
-⚛️ React + TypeScript	Frontend UI with type safety
-⚡ FastAPI / Node.js	Backend APIs & business logic
-🗃️ MongoDB / SQL	Database for storing hostel data
-🔐 Firebase Auth	Authentication system
-💅 Tailwind CSS	Responsive and modern UI
-📡 Networking (Custom)	MAC/IP-based attendance detection
-📦 Vercel / Render	Deployment
-⚙️ Installation & Setup
+---
+
+## 🧩 Features
+
+- 🧑‍🎓 **Student Management** – Add, update, and manage student records with complete details.
+- 🛏️ **Room Allocation System** – Assign rooms dynamically and manage occupancy efficiently.
+- 📡 **Smart Attendance (Network-Based)** –  
+  - Detects students via **MAC / IP address**  
+  - Works across multiple routers in hostel  
+  - No camera / biometric required  
+  - Fully automated attendance marking  
+- 🔐 **Authentication System** – Secure login with role-based access (Admin/User).
+- 🧑‍💼 **Admin Dashboard** – Manage students, rooms, and attendance from a centralized panel.
+- 💬 **Real-Time Chat System** – Communication between students and admin for queries and updates.
+- 📊 **Database Management** – Structured storage for students, rooms, and attendance logs.
+- 📱 **Fully Responsive UI** – Optimized for mobile, tablet, and desktop devices.
+
+---
+
+## 🛠️ Tech Stack
+
+| Tech                      | Purpose                                  |
+|---------------------------|------------------------------------------|
+| ⚛️ React + TypeScript      | Frontend UI with strict typing           |
+| ⚡ FastAPI / Node.js       | Backend & API handling                   |
+| 🗃️ MongoDB / SQL          | Database management                      |
+| 🔐 Firebase Auth           | Authentication (Login system)            |
+| 💅 Tailwind CSS            | Responsive and modern UI design          |
+| 📡 Networking Logic        | MAC/IP-based attendance detection        |
+| 📦 Vercel / Render         | Deployment                              |
+
+---
+
+## ⚙️ Installation & Setup
+
+```bash
 # 1. Clone the repository
 git clone https://github.com/your-username/hostel-manager.git
 cd hostel-manager
@@ -84,38 +73,9 @@ npm install
 cd frontend
 npm run dev
 
-# Backend
+# Backend (FastAPI)
 cd ../backend
 uvicorn main:app --reload
-# OR (if using Node)
+
+# OR (Node backend)
 nodemon index.js
-📡 How Attendance System Works
-System scans the hostel network
-Detects connected devices across multiple routers
-Matches device identity (MAC/IP) with registered student
-Marks attendance automatically
-
-✅ No manual entry
-✅ No biometric
-✅ Works in real-time
-
-🚀 Future Enhancements
-📍 GPS + Network hybrid attendance
-📊 Analytics dashboard for attendance trends
-🔔 Notification system (email/SMS)
-📅 Leave management system
-📦 Hostel inventory management
-🤝 Contribution
-
-Contributions are welcome!
-Feel free to fork the repo and submit a pull request.
-
-📜 License
-
-This project is licensed under the MIT License.
-
-📞 Contact
-
-If you'd like to collaborate or have any questions:
-
-🌐 Portfolio: https://anurag-portfolio-psi.vercel.app
