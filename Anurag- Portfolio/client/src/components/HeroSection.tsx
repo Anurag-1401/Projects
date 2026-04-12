@@ -3,7 +3,7 @@ import { useEffect, useState,ComponentProps, useRef, Children  } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Github, Linkedin, Mail ,Goal,Instagram} from 'lucide-react';
-import Profile from './img/image_c971d662.png'
+import Profile from './img/WhatsApp Image 2026-01-31 at 8.00.52 PM.jpeg'
 import { auth } from '../firebase/config';
 import { onAuthStateChanged,signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -16,6 +16,7 @@ const HeroSection = () => {
   const baseUrl = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
  const [profileData, setProfileData] = useState({
     email: '',
@@ -51,6 +52,8 @@ const HeroSection = () => {
         }
       } catch (error) {
         console.error('Error fetching admin details:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -86,11 +89,11 @@ const HeroSection = () => {
 
       <div className="ml-5 w-64 h-[450px] sm:w-64 sm:h-75 md:w-80 md:h-85 mb-5 mt-10 md:mb-20 relative -top-[20px] md:-top-[50px] 
       overflow-hidden shadow-lg  hover:scale-110 transition-transform duration-300 border p-2">
-        {
-          profileData.profilePic && (
-            <img src={profileData.profilePic || Profile} className="w-full h-full object-cover" alt="Profile" />
-          )
-        }
+        
+        <img src={loading ? Profile : (profileData.profilePic || Profile)} 
+        className="w-full h-full object-cover" 
+        alt="Profile" />
+
       </div>
 
     <section id="home" className="flex flex-col items-center justify-center relative overflow-hidden">
