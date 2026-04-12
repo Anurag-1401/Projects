@@ -1,23 +1,27 @@
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import date
 from sqlalchemy.orm import Session
 from db import SessionLocal
 from allModels import Attendance, StudentCreate, LeaveApplication
 import logging
+from services.auto_attendance import run_auto_attendance
 
 # Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Global scheduler instance
-scheduler = BackgroundScheduler()
+scheduler = AsyncIOScheduler()
 
 def mark_absent_job():
     """Mark students as absent if not marked present or on leave."""
     db: Session = SessionLocal()
     try:
-        students = db.query(StudentCreate).all()  # ✅ Use ORM model, not Pydantic schema
+
+        run_auto_attendance()
+
+        students = db.query(StudentCreate).all()
 
         for student in students:
             # Check if attendance for today already exists
@@ -80,6 +84,10 @@ def mark_absent_job():
 def start_scheduler():
     """Start APScheduler safely (Render-safe)."""
     if not scheduler.running:
+
+        logger.info("🕒⏩ Scheduler started for run auto attendance...")
+        scheduler.add_job(run_auto_attendance, "interval", minutes=2)
+        
         # Run every day at 23:59
         scheduler.add_job(mark_absent_job, CronTrigger(hour=23, minute=59))
 

@@ -33,7 +33,7 @@ def create(id:int,room:RoomCreate,db:Session=Depends(get_db)):
     return Room
 
 
-@router.delete('/del-room/{id}',status_code=status.HTTP_200_OK,response_model=RoomOut)
+@router.delete('/del-room/{id}',status_code=status.HTTP_200_OK)
 def create(id:int,db:Session=Depends(get_db)):
     Room = ro_crud.Del_Room(id,db)
 

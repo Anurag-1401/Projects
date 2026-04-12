@@ -1,18 +1,36 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState,useEffect,useRef } from "react";
 
 const ChatBot: React.FC = () => {
 
   const baseURL = import.meta.env.VITE_BACKEND_URL;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [warning, setWarning] = useState("");
   const [messages, setMessages] = useState<{ sender: "user" | "bot"; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const student = JSON.parse(localStorage.getItem('User'))?.student_details.email;
-  const admin = JSON.parse(localStorage.getItem('adminCreds'))?.Email;
+
+  const userData = JSON.parse(localStorage.getItem("User") || "null");
+  const adminData = JSON.parse(localStorage.getItem("adminCreds") || "null");
+
+  const student = userData?.student_details?.email;
+  const admin = adminData?.Email;
+
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
   
   const handleSend = async () => {
+    if (loading) return;
+
+    if (input.length > 100) {
+      setWarning("⚠️ Message too long");
+      return;
+    }
+
     if (!input.trim()) return;
   
     setMessages((prev) => [...prev, { sender: "user", text: input }]);
@@ -26,6 +44,10 @@ const ChatBot: React.FC = () => {
         question: userMessage,
         isAdmin: admin ? true : false,
       };
+
+      console.log("data",data)
+      console.log("student",student)
+      console.log("admin",admin)
   
       const response = await axios.post(`${baseURL}/chat/assistant`, data);
   
@@ -41,11 +63,28 @@ const ChatBot: React.FC = () => {
         console.log("error", response);
       }
     } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "⚠️ Server error. Please try again later." },
+      ]);
       console.error("Chatting error:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+  if (isOpen && messages.length === 0) {
+    setMessages([
+      {
+        sender: "bot",
+        text: admin
+          ? "Hello Admin 👨‍💼 👋\nHow can I assist you?"
+          : "Hello Student 🎓 👋\nHow can I help you?",
+      },
+    ]);
+  }
+}, [isOpen,admin,messages.length]);
   
 
   return (
@@ -81,18 +120,60 @@ const ChatBot: React.FC = () => {
                 {msg.text || 'Error in response'}
               </div>
             ))}
-            {loading && <div className="text-gray-500 text-sm">Bot is typing...</div>}
+            {loading && (
+              <div className="text-xs text-gray-400 italic">
+                🤖 Assistant is typing...
+              </div>
+            )}
+              <div ref={chatEndRef}></div>
           </div>
 
+          <div className="flex flex-wrap gap-1 mx-2 my-1">
+          {["My room", "My payments", "My complaints"].map((q) => (
+            <button
+              key={q}
+              onClick={() => setInput(q)}
+              className="text-xs bg-gray-200 px-2 py-1 rounded"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
           <div className="p-2 border-t flex items-center space-x-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type a message..."
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            />
+           <div className="relative flex items-center">
+             <input
+               type="text"
+               value={input}
+               onChange={(e) => {
+                 const value = e.target.value;
+                
+                 if (value.length <= 100) {
+                   setInput(value);
+                   setWarning("");
+                 } else {
+                   setWarning("⚠️ Maximum 100 characters allowed");
+                 }
+               }}
+               className="w-full border rounded-lg px-3 py-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Type a message..."
+               onKeyDown={(e) => {
+                 if (e.key === "Enter" && !loading) handleSend();
+               }}
+             />
+          
+             {/* Character Counter INSIDE input */}
+             <span className="absolute right-3 text-[10px] text-gray-400">
+               {input.length}/100
+             </span>
+           </div>
+             
+           {/* Warning BELOW input */}
+           {warning && (
+             <div className="text-xs text-red-500 mt-1">
+               {warning}
+             </div>
+           )}
             <button
               onClick={handleSend}
               className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"

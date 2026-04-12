@@ -28,34 +28,55 @@ def Edit_Room(id: int, room: RoomCreate, db: Session):
     existing = db.query(Room).filter(Room.id == id).first()
     if not existing:
         return None
-    
+
     existing.roomNo = room.roomNo
     existing.capacity = room.capacity
-    existing.occupied = room.occupied
+
+    valid_students = [s for s in room.students if s is not None]
+
+    assign = db.query(RoomAssignment).filter(
+        RoomAssignment.roomNo == existing.roomNo
+    ).first()
+
+    if not assign:
+        assign = RoomAssignment(
+            roomNo=existing.roomNo,
+            assignedBy=room.admin_email,
+            allocatedTo="[]",
+            available=existing.capacity
+        )
+        db.add(assign)
+        db.commit()
+        db.refresh(assign)
+
+    old_students = db.query(StudentAdded).filter(
+        StudentAdded.room_assignment_id == assign.id
+    ).all()
+
+    old_emails = {s.email for s in old_students}
+    new_emails = {s["email"] for s in valid_students}
+
+    for student in old_students:
+        if student.email not in new_emails:
+            student.room_assignment_id = None
+
+    for student_dict in valid_students:
+        student_obj = db.query(StudentAdded).filter(
+            StudentAdded.email == student_dict["email"]
+        ).first()
+
+        if student_obj:
+            student_obj.room_assignment_id = assign.id
+
+    existing.occupied = len(valid_students)
 
     if existing.occupied >= existing.capacity:
         existing.status = "full"
     else:
         existing.status = "available"
 
-    valid_students = [s for s in room.students if s is not None]
-    assign = db.query(RoomAssignment).filter(RoomAssignment.roomNo == existing.roomNo).first()
-    if assign:
-        old_students = db.query(StudentAdded).filter(StudentAdded.room_assignment_id == assign.id).all()
-
-        old_student_names = [s.name for s in old_students]
-        for student in old_students:
-            if student.email not in [s["email"] for s in valid_students]:
-                student.room_assignment_id = None
-
-        for student_dict in valid_students:
-            student_obj = db.query(StudentAdded).filter(StudentAdded.email == student_dict["email"]).first()
-            if student_obj and student_obj.name not in old_student_names:
-                student_obj.room_assignment_id = assign.id
-
-
-        assign.allocatedTo = json.dumps([s["name"] for s in valid_students])
-              
+    assign.allocatedTo = json.dumps([s["name"] for s in valid_students])
+    assign.available = existing.capacity - len(valid_students)
 
     db.commit()
     db.refresh(existing)
@@ -63,29 +84,37 @@ def Edit_Room(id: int, room: RoomCreate, db: Session):
     return existing
 
 
-def Del_Room(id:int,db:Session):
+
+def Del_Room(id: int, db: Session):
     existing = db.query(Room).filter(Room.id == id).first()
     if not existing:
         return None
-    
-    
 
-    ass_id = db.query(RoomAssignment).filter(existing.roomNo == RoomAssignment.roomNo).first()
+    assignment = db.query(RoomAssignment).filter(
+        RoomAssignment.roomNo == existing.roomNo
+    ).first()
 
-    if ass_id:
-        students = db.query(StudentAdded).filter(StudentAdded.room_assignment_id == ass_id.id).all()
+    if assignment:
+        # 🔥 Step 1: remove student links
+        students = db.query(StudentAdded).filter(
+            StudentAdded.room_assignment_id == assignment.id
+        ).all()
+
         for student in students:
             student.room_assignment_id = None
-            db.refresh(student)
-        
-        db.delete(ass_id)
 
-    
+        db.flush()  # 🔥 VERY IMPORTANT
+
+        # 🔥 Step 2: delete assignment
+        db.delete(assignment)
+        db.flush()  # 🔥 FORCE EXECUTION
+
+    # 🔥 Step 3: delete room
     db.delete(existing)
-    db.commit()
-   
 
-    return existing
+    db.commit()
+
+    return {"message": "Room deleted successfully"}
 
 
 def Get_Room(db:Session):

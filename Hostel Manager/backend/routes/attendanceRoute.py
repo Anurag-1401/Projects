@@ -9,7 +9,7 @@ import os,tempfile
 from CRUD import attendance as as_crud
 from db import get_db
 from allSchemas import AttendanceCreate,AttendanceOut
-
+from allModels import StudentAdded
 
 router = APIRouter(
     prefix='/attendance',

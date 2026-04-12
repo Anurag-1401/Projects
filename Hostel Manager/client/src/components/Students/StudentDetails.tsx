@@ -1,11 +1,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Pencil, User, Mail, Phone, MapPin, Calendar, GraduationCap ,KeySquareIcon,BedIcon,AlertCircle, Save} from 'lucide-react';
+import { Pencil, User, Mail, Phone, MapPin, Calendar, GraduationCap ,KeySquareIcon,BedIcon,AlertCircle, Save, Network} from 'lucide-react';
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react'
-import { Input } from '@/components/ui/input'
+import { Input} from '@/components/ui/input'
 import { Alert, AlertDescription} from '@/components/ui/alert'
 
 
@@ -16,11 +16,12 @@ export const StudentDetails: React.FC = () => {
   const [isEdit,setisEdit] = useState(false);
   const [error, setError] = useState<string>('')
   const[password,setPassword] = useState('')
-
+  const [isMacSaved, setIsMacSaved] = useState(false);
 
   const [formData, setFormData] = useState({
     id:'',
     name: '',
+    mac_address: '',
     Guardian_Name: '',
     Guardian_Phone: 0,
     reg_no: '',
@@ -44,7 +45,11 @@ const fetchStudent = async (): Promise<void> => {
     if (response.status==200 || res.status == 200) {
       setFormData(response.data)
       setPassword(res.data.password)
-      console.log("Student",response,res)
+
+      if (response.data.mac_address) {
+        setIsMacSaved(true);
+      }
+
     }
   } catch (error) {
     console.error('Failed to fetch student:', error)
@@ -60,6 +65,7 @@ const handleProfileUpdate = async () => {
   const data =  {
     phone:formData.phone,
     DOB:formData.DOB,
+    mac_address:formData.mac_address,
     Guardian_Name:formData.Guardian_Name,
     Guardian_Phone:formData.Guardian_Phone,
   }
@@ -68,6 +74,11 @@ const handleProfileUpdate = async () => {
     const response = await axios.put(`${baseURL}/student/edit/${formData.id}` ,data)
     const res = await axios.put(`${baseURL}/studentLogin/edit/${formData.id}` , {password:password})
       if (response.status == 200 || res.status == 200) {
+        
+        if (formData.mac_address) {
+          setIsMacSaved(true);
+        }
+
         toast({
           title: "Profile Updated",
           description: "Your profile information has been saved successfully.",
@@ -76,10 +87,6 @@ const handleProfileUpdate = async () => {
         fetchStudent()
 
         console.log("Student",response.data,res.data)
-
-        setTimeout(() => {
-          window.location.reload()
-        }, 500);
       }
   } catch (error) {
 
@@ -108,14 +115,7 @@ return (
         <Button
          variant="outline"
          size="sm"
-         onClick={() => { 
-           setisEdit(prev => !prev);
-          //  fetchStudent();
-           {false && setTimeout(() => {
-             window.location.reload()
-           }, 500);}
-         }
-         }
+         onClick={() => setisEdit(prev => !prev)}
          className={`border ${
            isEdit
              ? 'text-red-400 border-red-400 hover:bg-red-400'
@@ -162,6 +162,28 @@ return (
                     disabled={true}
                   />
                 </div>
+              </div>
+
+              <div>
+              <div className="flex items-start gap-3">
+                <Network className="text-muted-foreground mt-6" size={18} />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground mb-1">MAC Address</p>
+                  <Input
+                    type="text"
+                    placeholder="Enter MAC Address"
+                    value={formData.mac_address}
+                    disabled={isMacSaved}
+                    onChange={(e) => setFormData({...formData, mac_address: e.target.value.toLowerCase()})}
+                  />
+                </div>
+              </div>
+
+              {isMacSaved && isEdit && (
+              <p className="text-xs text-red-500 mt-1">
+                  MAC address cannot be changed once set
+                </p>
+              )}
               </div>
           
               <div className="flex items-start gap-3">

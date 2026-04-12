@@ -11,6 +11,7 @@ import { Home, AlertCircle, User, Lock } from 'lucide-react'
 import { FcGoogle } from 'react-icons/fc';
 import {createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup,updateProfile} from 'firebase/auth'
 import { auth, googleProvider} from './firebase/config.js';
+import { useData } from '@/hooks/DataContext.js'
 
 
 declare global {
@@ -25,6 +26,7 @@ export function Login() {
   const baseURL = import.meta.env.VITE_BACKEND_URL;
 
   const navigate = useNavigate()
+  const { setAdmin } = useData();
   const [activeTab, setActiveTab] = useState("signin");
 
   const [email, setEmail] = useState<string>('')
@@ -51,9 +53,11 @@ export function Login() {
         throw new Error(`Unexpected status ${apiRes.status}`);
       }
 
-      localStorage.setItem("adminCreds", JSON.stringify({ Email:email }));
-      role === 'studentLogin' && localStorage.setItem("User", JSON.stringify(apiRes.data));
+      if (role === "admin") localStorage.setItem("adminCreds", JSON.stringify({ Email:email }));
+      if(role === 'studentLogin') localStorage.setItem("User", JSON.stringify(apiRes.data));
       navigate('/home',{replace:true})
+
+      window.location.reload();
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
@@ -72,7 +76,7 @@ export function Login() {
       console.log("✅ Profile:", profileData);
 
       
- } catch (err: any) {
+ } catch (err) {
       console.error("❌ Signup Error:", err);
       toast({
         title: "Signup Failed",
@@ -101,9 +105,11 @@ const loginEmail = async () => {
         throw new Error(`Unexpected status ${apiRes.status}`);
       }
 
-      localStorage.setItem("adminCreds", JSON.stringify({ Email: email }));
-      role === 'studentLogin' && localStorage.setItem("User", JSON.stringify(apiRes.data));
+      if(role === 'admin') localStorage.setItem("adminCreds", JSON.stringify({ Email: email }));
+      if(role === 'studentLogin') localStorage.setItem("User", JSON.stringify(apiRes.data));
       navigate('/home',{replace:true})
+
+      window.location.reload();
 
       // const userCredential = await signInWithEmailAndPassword(auth, email, password);
       // const idToken = await userCredential.user.getIdToken();
@@ -122,7 +128,7 @@ const loginEmail = async () => {
      
     
 
-} catch (error: any) {
+} catch (error) {
       if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
         toast({
           title: "Login Failed",
@@ -178,10 +184,17 @@ const loginEmail = async () => {
           console.log("Google Sign-in", res.user);
   
           const idToken = await res.user.getIdToken();
+           
+            
+            if(role === 'admin') localStorage.setItem("adminCreds", JSON.stringify({ Email: res.user.email }));
 
-          localStorage.setItem("adminCreds", JSON.stringify({ Email: res.user.email }));
-          role === 'studentLogin' && localStorage.setItem("User", JSON.stringify(response.data));
-          navigate('/home',{replace:true})
+            if (role === 'studentLogin') {
+              localStorage.setItem("User", JSON.stringify(response.data));
+            }
+
+            navigate('/home', { replace: true });
+
+            window.location.reload();
 
           const profileRes = await fetch(`${baseURL}/auth/profile`, {
             headers: { Authorization: `Bearer ${idToken}` },
@@ -259,7 +272,11 @@ const loginEmail = async () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={(e) => { e.preventDefault();create ? signUpEmail() : loginEmail();}} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault();
+              if (create) signUpEmail(); 
+              else loginEmail();
+              }} 
+              className="space-y-4">
               <div className="space-y-2">
 
                 <Label htmlFor="username">Institute Email</Label>

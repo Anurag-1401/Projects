@@ -88,6 +88,7 @@ class RoomAssignmentOut(RoomAssignmentBase):
 class StudentAdd(StudentBase):
     Guardian_Name:str
     Guardian_Phone:int
+    mac_address:Optional[str] = None
     reg_no:str
     phone: int
     department: str
@@ -102,6 +103,7 @@ class StudentAdd(StudentBase):
 
 class StudentUpdate(BaseModel):
     phone: int
+    mac_address:Optional[str] = None
     DOB:date
     Guardian_Name:str
     Guardian_Phone:int
@@ -275,8 +277,8 @@ class PaymentOut(PaymentBase):
 class Chat(BaseModel):
     email:str
     question:str
-    isAdmin:Optional[bool] = None
-
+    isAdmin: bool = Field(..., description="True if admin, False if student")
+    
 class ChatOut(Chat):
     response:str
 

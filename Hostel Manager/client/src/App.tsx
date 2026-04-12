@@ -21,7 +21,7 @@ const App = () => (
         <DataProvider>
         <Routes>
           <Route path="/" element={<PrivateLogin><Login/></PrivateLogin>} />
-          <Route path="/home" element={ <PrivateRoute><HeaderAdmin/></PrivateRoute> }/>
+          <Route path="/home" element={ <PrivateRoute/> }/>
           <Route path="*" element={<NotFound />} />
         </Routes>
         </DataProvider>

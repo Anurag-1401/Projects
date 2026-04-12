@@ -154,9 +154,15 @@ const stats = {
           </Button>
       </div>
 
-     <div className='bg-gray-100'>
+     {/* <div className='bg-gray-100'>
      <Capture/>  
-      </div>    
+      </div>     */}
+
+      <div className="p-4 bg-gray-100 text-center">
+        <h3 className="text-lg font-semibold">
+          Attendance is marked automatically via Hostel Wi-Fi
+        </h3>
+      </div>
 
           {(error) && (
         <Alert variant={"destructive"}>

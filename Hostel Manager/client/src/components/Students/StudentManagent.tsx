@@ -15,11 +15,12 @@ import {
   Search, 
   Phone,
   Mail,
-  AlertCircle
+  AlertCircle,
+  Upload
 } from 'lucide-react'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast';
-
+import { handleFileUpload } from './excelImport'
 
 
 export function StudentManagement(): JSX.Element {
@@ -41,6 +42,7 @@ export function StudentManagement(): JSX.Element {
     name: '',
     Guardian_Name: '',
     Guardian_Phone: '',
+    mac_address: '',
     reg_no: '',
     email: '',
     phone: '',
@@ -65,7 +67,7 @@ useEffect(() => {
   } else {
     setError("");
   }
-}, [formData.reg_no, students]);
+}, [formData.reg_no, students,editingStudent]);
 
  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
@@ -126,7 +128,6 @@ useEffect(() => {
           title:`Student (${student.reg_no}) Deleted`
         })
         console.log(response)
-        window.location.reload()
         refetchAll.students()
       } else {
         setError('Failed to delete student')
@@ -147,6 +148,7 @@ useEffect(() => {
       DOB: '',
       Guardian_Name: '',
       Guardian_Phone: '',
+      mac_address: '',
       department: '',
       year: '',
       Addmission_Date:'',
@@ -172,6 +174,23 @@ const filteredStudents = students.filter(student => {
     return Array.from(new Set(students.map(s => s[key] as string).filter(Boolean)))
   }
 
+  const handleDeallocate = async (student) => {
+  try {
+    await axios.put(`${baseURL}/student/deallocate/${student.id}`);
+
+    toast({ title: "Student deallocated" });
+
+    setIsAddDialogOpen(false);
+
+    await refetchAll.students();
+    await refetchAll.rooms();
+    await refetchAll.assignedRooms();
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -193,6 +212,29 @@ const filteredStudents = students.filter(student => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
+
+
+    <div className="flex gap-3 items-center">
+
+    {/* 🔥 Hidden File Input */}
+    <input
+      type="file"
+      accept=".xlsx, .xls, .csv"
+      id="excelUpload"
+      className="hidden"
+      onChange={(e) => handleFileUpload(e, refetchAll)}
+    />
+
+    {/* 🔥 Upload Button */}
+    <Button
+      variant="outline"
+      onClick={() => document.getElementById("excelUpload")?.click()}
+    >
+      <Upload className="h-4 w-4 mr-2" />
+      Import Excel
+    </Button>
+
+    
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
@@ -253,6 +295,21 @@ const filteredStudents = students.filter(student => {
               required
             />
           </div>
+
+          {editingStudent && (
+          <div className="space-y-2">
+            <Label>Mac Address</Label>
+               <Input
+                id="mac_address"
+                name="mac_address"
+                type="text"
+                value={formData.mac_address}
+                onChange={(e) => setFormData({ ...formData, mac_address: e.target.value })}
+                placeholder="Enter MAC Address"
+                required
+              />
+            </div>
+        )}
           
           <div className="space-y-2">
             <Label htmlFor="phone">Phone *</Label>
@@ -353,6 +410,29 @@ const filteredStudents = students.filter(student => {
           </div>
         </div>
 
+        {editingStudent && (
+          <div className="space-y-2">
+            <Label>Room Allocation</Label>
+
+            <div className="flex items-center justify-between border p-3 rounded-lg">
+              <span className="text-sm font-medium">
+                {editingStudent.room_assignment?.roomNo || "Not Allocated"}
+              </span>
+
+              {editingStudent.room_assignment?.roomNo && (
+                <Button
+                  type='button'
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeallocate(editingStudent)}
+                >
+                  Deallocate
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
        
         {error && (
           <Alert variant="destructive">
@@ -380,6 +460,7 @@ const filteredStudents = students.filter(student => {
       </form>
     </DialogContent>
 </Dialog>
+</div>
 </div>
 
 

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useMemo } from 'react';
 import { useData } from '@/hooks/DataContext'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,9 +67,11 @@ const getFloorFromRoomNo = (roomNo) => {
   return null;
 };
   
-const filteredRooms = selectedFloor === 'all' 
-    ? Rooms 
-    : Rooms.filter(room => getFloorFromRoomNo(room.roomNo) === selectedFloor);
+  const filteredRooms = useMemo(() => {
+    return selectedFloor === 'all'
+      ? Rooms
+      : Rooms.filter(room => getFloorFromRoomNo(room.roomNo) === selectedFloor);
+  }, [Rooms, selectedFloor]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -151,7 +153,7 @@ const filteredRooms = selectedFloor === 'all'
       room.students.forEach((stu) => assignedSet.add(stu.email));
     });
   
-    let available = students.filter(
+    const available = students.filter(
       (student) => !selectedSet.has(student.email) && !assignedSet.has(student.email)
     );
   
@@ -183,7 +185,7 @@ useEffect(() => {
   } else {
     setError("");
   }
-}, [formData.roomNo, Rooms,allocData.roomNo]);
+}, [formData.roomNo, Rooms,allocData.roomNo,editingRoom]);
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -211,8 +213,9 @@ useEffect(() => {
           title:`Room ${editingRoom ? 'Updated' : 'Added'}`
         })
         refetchAll.rooms()
+        refetchAll.assignedRooms()
+        refetchAll.students()
         setIsAddDialogOpen(false);
-        console.log("Room:",response);
         setEditingRoom(1);
       }
     } catch (error) {
@@ -245,6 +248,7 @@ useEffect(() => {
           title:`Room Allocated`
         })
         refetchAll.assignedRooms();
+        refetchAll.students();
         setIsAssignDialogOpen(false);
         console.log("Room Assigned:",response)
       }
@@ -302,6 +306,8 @@ const delRoom = async (room) => {
         title:`Room Deleted`
       })
       refetchAll.rooms();
+      refetchAll.assignedRooms();
+      refetchAll.students();
       console.log("Room:",response)
     }
   } catch (error) {

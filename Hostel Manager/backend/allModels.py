@@ -37,6 +37,7 @@ class StudentAdded(Base):
     id = Column(BigInteger, primary_key=True, index=True)
     admin_id = Column(String, ForeignKey("AdminCreate.id"), nullable=False)
     name = Column(String)
+    mac_address = Column(String, unique=True, nullable=False)
     Guardian_Name = Column(String)
     Guardian_Phone = Column(BigInteger)
     reg_no = Column(String,unique=True)
@@ -109,7 +110,7 @@ class RoomAssignment(Base):
     __tablename__ = "room_assignments"
 
     id = Column(BigInteger, primary_key=True)
-    roomNo = Column(String,ForeignKey("rooms.roomNo"))
+    roomNo = Column(String,ForeignKey("rooms.roomNo", ondelete="CASCADE"), unique=True, nullable=False)
     assignedBy = Column(String, ForeignKey("AdminCreate.email"))
     assignedDate = Column(DateTime, default=datetime.now(timezone.utc))
     available = Column(BigInteger)
@@ -214,6 +215,7 @@ class Assistant(Base):
     student = Column(String,ForeignKey('StudentCreate.email'))
     question = Column(String)
     response = Column(String)
+    isAdmin = Column(Boolean, default=False)
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 

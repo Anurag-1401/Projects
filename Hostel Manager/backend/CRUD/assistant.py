@@ -28,70 +28,136 @@ def extract_student_from_text(q: str, db: Session):
 def fetch_from_db(chat: Chat, db: Session):
     q = chat.question.lower()
 
-    # ✅ Step 1: Identify which student we are talking about
+    # 🔥 Greeting handling
+    if any(greet in q for greet in ["hi", "hello", "hey"]):
+        return "Hello! 👋 How can I help you?"
+
+    response = []
+
+    # =========================================================
+    # 👨‍💼 ADMIN LOGIC
+    # =========================================================
     if chat.isAdmin:
+        # 🔹 CASE 1: Admin asking about himself
+        if any(word in q for word in ["my", "me", "mine"]):
+            if "email" in q:
+                response.append(f"Email: {chat.email}")
+            if "name" in q:
+                response.append("Name: Admin")
+            if "phone" in q:
+                response.append("Phone: Not available")
+
+            return "\n".join(response) if response else "⚠️ No personal data available."
+
+        # 🔹 CASE 2: Admin asking about student
         student = extract_student_from_text(chat.question, db)
+
         if not student:
-            return None  # Admin asked but student not found
+            return (
+                "⚠️ Please mention student name or email.\n\n"
+                "Examples:\n"
+                "- What is Rahul's room?\n"
+                "- Show payment of amit@xyz.com\n"
+            )
+
+    # =========================================================
+    # 🎓 STUDENT LOGIC
+    # =========================================================
     else:
-        student = db.query(StudentAdded).filter(StudentAdded.email == chat.email).first()
-        if not student:
-            return "No student found with this email."
+        # 🔹 CASE 1: Student asking about himself
+        if any(word in q for word in ["my", "me", "mine"]):
+            student = db.query(StudentAdded).filter(
+                StudentAdded.email == chat.email
+            ).first()
 
-    db_info = []
+            if not student:
+                return "⚠️ Student record not found."
 
-    # ✅ Step 2: Check what info is being asked
-    if any(word in q for word in ["name", "full name"]):
-        db_info.append(f"Student Name: {student.name}")
-    if any(word in q for word in ["email", "mail"]):
-        db_info.append(f"Email: {student.email}")
-    if any(word in q for word in ["phone", "contact"]):
-        db_info.append(f"Phone: {student.phone}")
-    if any(word in q for word in ["guardian", "parent"]):
-        db_info.append(f"Guardian Name: {student.Guardian_Name}, Guardian Phone: {student.Guardian_Phone}")
+        # 🔹 CASE 2: Student asking about admin (LIMITED ACCESS)
+        elif any(word in q for word in ["admin", "warden", "rector"]):
+            return (
+                "👨‍💼 Admin Contact:\n"
+                "Email: admin@hostel.com\n"
+                "Phone: +91-XXXXXXXXXX"
+            )
 
-    # Room info
-    if any(word in q for word in ["room", "hostel", "hall"]):
+        # 🔹 CASE 3: Student trying to access other students ❌
+        else:
+            return "⚠️ You can only access your own details."
+
+    # =========================================================
+    # 🔍 COMMON DATA FETCH (FOR VALID STUDENT)
+    # =========================================================
+
+    if any(k in q for k in ["name", "who am i"]):
+        response.append(f"Name: {student.name}")
+
+    if any(k in q for k in ["email"]):
+        response.append(f"Email: {student.email}")
+
+    if any(k in q for k in ["phone", "contact"]):
+        response.append(f"Phone: {student.phone}")
+
+    if any(k in q for k in ["guardian", "parent"]):
+        response.append(
+            f"Guardian: {student.Guardian_Name} ({student.Guardian_Phone})"
+        )
+
+    # 🏠 ROOM
+    if any(k in q for k in ["room", "hostel"]):
         if student.room_assignment:
-            db_info.append(f"Room Number: {student.room_assignment.roomNo}")
+            response.append(f"Room No: {student.room_assignment.roomNo}")
         else:
-            db_info.append("No room assigned yet.")
+            response.append("Room not assigned")
 
-    # Payments
-    if any(word in q for word in ["fee", "due", "payment"]):
-        payments = db.query(Payment).filter(Payment.studentId == student.id).all()
+    # 💰 PAYMENTS
+    if any(k in q for k in ["payment", "fee", "due"]):
+        payments = db.query(Payment).filter(
+            Payment.studentId == student.id
+        ).all()
+
         if payments:
-            payment_str = " | ".join([f"Amount: {p.amount}, Date: {p.date}, Status: Paid" for p in payments])
-            db_info.append(payment_str)
+            for p in payments:
+                response.append(f"₹{p.amount} | {p.date} | Paid")
         else:
-            db_info.append("No payment records found.")
+            response.append("No payment records")
 
-    # Complaints
+    # 📝 COMPLAINTS
     if "complaint" in q:
-        complaints = db.query(Complaint).filter(Complaint.student_name.ilike(f"%{student.name}%")).all()
+        complaints = db.query(Complaint).filter(
+            Complaint.student_name.ilike(f"%{student.name}%")
+        ).all()
+
         if complaints:
-            db_info.append(" | ".join([f"Complaint: {c.title}, Status: {c.status}, Response: {c.response}" for c in complaints]))
+            for c in complaints:
+                response.append(f"{c.title} → {c.status}")
         else:
-            db_info.append("No complaints found.")
+            response.append("No complaints found")
 
-    # Leaves
+    # 🌴 LEAVE
     if "leave" in q:
-        leaves = db.query(LeaveApplication).filter(LeaveApplication.student.ilike(f"%{student.name}%")).all()
+        leaves = db.query(LeaveApplication).filter(
+            LeaveApplication.student.ilike(f"%{student.name}%")
+        ).all()
+
         if leaves:
-            db_info.append(" | ".join([f"Reason: {l.reason}, From: {l.start_date}, To: {l.end_date}, Status: {l.status}" for l in leaves]))
+            for l in leaves:
+                response.append(
+                    f"{l.reason} ({l.start_date} to {l.end_date}) → {l.status}"
+                )
         else:
-            db_info.append("No leave records found.")
+            response.append("No leave records")
 
-    # Visitors
+    # 👥 VISITOR
     if "visitor" in q:
-        visitors = db.query(VisitorLog).filter(VisitorLog.student_email == student.email).all()
-        if visitors:
-            db_info.append(" | ".join([f"Visitor: {v.visitor_name}, Phone: {v.visitor_phone}, Check-in: {v.check_in}" for v in visitors]))
-        else:
-            db_info.append("No visitor records found.")
+        visitors = db.query(VisitorLog).filter(
+            VisitorLog.student_email == student.email
+        ).all()
 
-    # ✅ Step 3: Return collected info
-    if db_info:
-        return " || ".join(db_info)
-    else:
-        return None
+        if visitors:
+            for v in visitors:
+                response.append(f"{v.visitor_name} ({v.check_in})")
+        else:
+            response.append("No visitors found")
+
+    return "\n".join(response) if response else "⚠️ No relevant data found."

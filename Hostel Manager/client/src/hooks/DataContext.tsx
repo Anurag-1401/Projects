@@ -8,6 +8,10 @@ const DataContext = createContext(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
+const [admin, setAdmin] = useState(()=>{
+    return JSON.parse(localStorage.getItem('User') || localStorage.getItem('adminCreds') || "null");
+});
+
   const logger = useMemo(() => {
     return JSON.parse(localStorage.getItem('User') || localStorage.getItem('adminCreds') || "null");
   }, []);
@@ -23,6 +27,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+   useEffect(()=>{
+    if(!admin || !admin.Email) return;
+    refetchAll()
+  },[admin])
+  
   const fetchStudents = async () => {
     try {
       const res = await axios.get(`${baseURL}/student/get-students`);
@@ -155,14 +164,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   refetchAll.assignedRooms = () => run(fetchAssignedRooms);
   refetchAll.complaints = () => run(fetchComplaints);
 
-  useEffect(()=>{
-    refetchAll()
-  },[logger])
-
   
   return (
     <DataContext.Provider
-      value={{ students, Rooms, RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll }}
+      value={{ students, Rooms, RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll ,admin,setAdmin}}
     >
       {children}
     </DataContext.Provider>
