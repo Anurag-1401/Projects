@@ -7,8 +7,6 @@ from ROUTER import routes
 
 app = FastAPI()
 
-allModels.Base.metadata.create_all(bind=engine)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -30,6 +28,7 @@ async def health_check(request: Request):
 
 @app.on_event("startup")
 async def startup_event():
+    allModels.Base.metadata.create_all(bind=engine)
     attendanceJob.start_scheduler()
 
 @app.get('/')
