@@ -49,9 +49,9 @@ const AdminAccessGate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-        {checking && <h2 className="text-white">Checking Admin Status... Please wait!</h2>}
-    </div>
+   <div className="min-h-screen bg-gray-100 p-6">
+    {checking && <h2 className="text-black">Checking Admin Status... Please wait!</h2>}
+  </div>
   );
 };
 
