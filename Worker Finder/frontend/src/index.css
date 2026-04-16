@@ -9,6 +9,7 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: #f4f4f4;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 header {
@@ -149,4 +150,13 @@ footer {
   color: white;
   text-align: center;
   padding: 20px 0;
+}
+
+[data-aos] {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
 }

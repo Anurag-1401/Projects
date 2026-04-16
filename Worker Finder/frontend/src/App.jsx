@@ -1,5 +1,3 @@
-// src/App.jsx
-import React from 'react';
 import HomePage from './pages/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/loginPage';

@@ -1,4 +1,3 @@
-import React from 'react';
 import axios from 'axios';
 import { useEffect,useState} from 'react';
 import { useSelector } from 'react-redux';
@@ -26,6 +25,7 @@ import search from '../logos/magnifying-glass-solid.svg';
 import help from '../logos/circle-info-solid.svg'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import AIAgent from './aiAgent';
 
 const categories = [
   { name: "Plumbing", image: plumbing, path: "/plumber" },
@@ -115,7 +115,7 @@ useEffect(() => {
       setPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholderTexts.length);
     }, 1500);
     return () => clearInterval(interval); 
-  }, []);
+  }, [placeholderTexts.length]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -334,6 +334,9 @@ useEffect(() => {
        </header>
        
        <div>
+
+        <AIAgent/>
+       
   {!user && (
     <>
       {showAnnouncement && (
