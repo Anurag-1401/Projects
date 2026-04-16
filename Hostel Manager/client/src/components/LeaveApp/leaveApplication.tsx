@@ -3,12 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useData } from '@/hooks/DataContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
   Plus, 
@@ -23,7 +20,8 @@ import {
 
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast';
-
+import { CreateLeaveDialog } from "@/components/LeaveApp/CreateLeaveDialog"
+import { ViewLeaveDialog } from "@/components/LeaveApp/viewLeaveDialog"
 
 export function LeaveApplications(): JSX.Element {
 
@@ -33,75 +31,22 @@ export function LeaveApplications(): JSX.Element {
 
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false)
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [selectedDate, setSelectedDate] = useState('')
   const [remarks, setRemarks] = useState('')
-  const [formData, setFormData] = useState({
-    reason: '',
-    start_date: '', 
-    end_date: '',
-  })
   
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<string>('')
 
   const student = JSON.parse(localStorage.getItem('User'))
+  const adminData = JSON.parse(localStorage.getItem("adminCreds"));
+  const userRole = adminData?.role; 
 
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
-
-    const today = new Date();
-    const startDate = new Date(formData.start_date);
-    const endDate = new Date(formData.end_date);
-  
-    today.setHours(0, 0, 0, 0);
-
-    if (startDate < today) {
-      toast({
-          title:"Start date cannot be earlier than today.",
-          variant:"destructive"
-        })
-
-        return; 
-    } else if(endDate < today){
-      toast({
-          title:"End date cannot be earlier than today.",
-          variant:"destructive"
-        })
-
-        return;
-    }
-
+  const handleStatusUpdate = async (Id: number, status: string): Promise<void> => {
     try {
-      const response = await axios.post(`${baseURL}/leave/add-leave`, {...formData,studentId:student?.student_details.id} )
-
-      if (response.status === 201) {
-        console.log("Application Added",response)
-        setSuccess('Application sent successfully')
-        refetchAll.application()
-        resetForm()
-        setIsAddDialogOpen(false)
-        toast({
-          title:"Application sent"
-        })
-      } else {
-        setError('Failed to sent Application')
-      }
-    } catch (error) {
-      setError('Network error. Please try again.')
-      console.error('Application sending error:', error)
-    }
-  }
-
-
-  const handleStatusUpdate = async (Id: Number, status: string): Promise<void> => {
-    try {
-      const response = await axios.put(`${baseURL}/leave/edit-leave/${Id}`,{status,response:remarks,approvedBy:JSON.parse(localStorage.getItem("adminCreds")).Email})
+      const response = await axios.put(`${baseURL}/leave/edit-leave/${Id}`,{status,response:remarks,approvedBy:adminData.Email})
 
       if (response.status == 200) {
         setSuccess('Application updated successfully')
@@ -119,16 +64,6 @@ export function LeaveApplications(): JSX.Element {
     }
   }
 
-  const resetForm = (): void => {
-    setFormData({
-      reason: '',
-      start_date: '',
-      end_date: '',
-    })
-    setError('')
-    setSuccess('')
-  }
-
   const openViewDialog = (application): void => {
     setSelectedApplication(application)
     setRemarks(application.remarks || '')
@@ -142,7 +77,9 @@ export function LeaveApplications(): JSX.Element {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
-  const thisApplications = student ? applications.filter(ap => ap.student === student?.student_details.name) : applications
+  const thisApplications = student ? applications.filter(ap => ap.student === student?.student_details.name) : 
+          (userRole === "coordinator" ? applications.filter(ap => ap.current_level === "coordinator") : 
+          (userRole === "warden" ? applications.filter(ap => ap.current_level === "warden") : applications))
 
   const filteredApplications = thisApplications.filter(application => {
     const matchesSearch = application.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -157,6 +94,7 @@ export function LeaveApplications(): JSX.Element {
 
     return matchesSearch && matchesStatus && matchesDate
   })
+
 
   const getStatusColor = (status: string): string => {
     switch (status) {
@@ -208,84 +146,9 @@ export function LeaveApplications(): JSX.Element {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Leave Applications</h2>
-        {student && <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Application
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Submit Leave Application</DialogTitle>
-              <DialogDescription>
-                Submit a leave application on behalf of a student
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date *</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={formData.start_date}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date *</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={formData.end_date}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              {formData.start_date && formData.end_date && (
-                <div className="text-sm text-gray-600">
-                  Duration: {calculateDays(formData.start_date, formData.end_date)} day(s)
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="reason">Reason for Leave *</Label>
-                <Textarea
-                  id="reason"
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  placeholder="Please provide detailed reason for leave..."
-                  rows={4}
-                  required
-                />
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    resetForm()
-                    setIsAddDialogOpen(false)
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Submit Application</Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>}
+        {student && (
+          <CreateLeaveDialog refetch={refetchAll.application} />
+        )}
       </div>
 
       {(success || error) && (
@@ -384,6 +247,7 @@ export function LeaveApplications(): JSX.Element {
                   <TableHead>Leave Details</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Stage</TableHead>
                   <TableHead>Applied Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -425,78 +289,131 @@ export function LeaveApplications(): JSX.Element {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
+                        {application.current_level === "coordinator"
+                        ? "Coordinator Review"
+                        : "Warden Review"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
                         {new Date(application.createdAt).toLocaleDateString()}
                       </div>
                     </TableCell>
                    
-                    <TableCell>
-                     {student ? (
-                        <div className="text-sm text-gray-500">
-                        {application.status !== 'approved' ? (
-                          <>
-                         {application.response}
-                         {application.status === 'rejected' && (
-                           <div className="flex flex-col mt-2 space-y-1">
-                             <span >By: {application.approved_by}</span>
-                             <span>
-                             On: {new Date(application.updatedAt).toLocaleDateString()}
-                           </span>
-                           </div>
-                         )}
-                       </>
-
-                        ):(
-                          <>
-                          {getStatusIcon(application.status)}
-                          <div className='flex flex-col mt-2 space-y-1'>
-                          <span >By: {application.approved_by}</span>
-                             <span>
-                             On: {new Date(application.updatedAt).toLocaleDateString()}
-                           </span>
+                   <TableCell>
+                    {student ? (
+                      // 🔹 STUDENT VIEW
+                      <div className="text-sm text-gray-300">
+                      
+                        {/* Pending */}
+                        {application.status === "pending" && (
+                          <div className="flex flex-col space-y-1">
+                            <span className="text-yellow-400">
+                              Waiting for {application.current_level}
+                            </span>
+                            <span className="text-gray-400 text-xs">
+                              {application.response}
+                            </span>
                           </div>
-                          </>
+                        )}
+                  
+                        {/* Approved */}
+                        {application.status === "approved" && (
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center gap-1 text-green-400">
+                              {getStatusIcon(application.status)}
+                              <span>Approved</span>
+                            </div>
+                            <span className="text-xs text-gray-400">
+                              By: {application.approved_by}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              On: {new Date(application.updatedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                  
+                        {/* Rejected */}
+                        {application.status === "rejected" && (
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center gap-1 text-red-400">
+                              {getStatusIcon(application.status)}
+                              <span>Rejected</span>
+                            </div>
+                            <span className="text-xs text-gray-400">
+                              {application.response}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              By: {application.approved_by}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              On: {new Date(application.updatedAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         )}
                       </div>
-                     ): (
-                      <div className="flex space-x-2">
-                      {application.status === 'pending' ? (
-
-                        <>
-                        <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openViewDialog(application)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                  
+                    ) : (
+                      // 🔹 ADMIN / COORDINATOR VIEW
+                      <div className="flex flex-col space-y-2">
                       
-                      <Button
-                        size="sm"
-                        onClick={() => handleStatusUpdate(application.id, 'approved')}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleStatusUpdate(application.id, 'rejected')}
-                        variant="destructive"
-                      >
-                        Reject
-                      </Button>
-                        </>
-                      ):(
-                      <div className='flex flex-col mt-2'>
-                        {getStatusIcon(application.status)}
-                        <div className="flex flex-col mt-2 space-y-1">
-                         <span >By: {application.approved_by}</span>
-                         <span> On: {new Date(application.updatedAt).toLocaleDateString()}</span>
-                       </div>
-                     </div>
-                      )}
-                    </div>
-                     )}
-                    </TableCell>
+                        {/* Pending → show actions ONLY if correct level */}
+                        {application.status === "pending" ? (
+                          <>
+                            <div className="text-xs text-gray-400">
+                              Current: {application.current_level}
+                            </div>
+                        
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openViewDialog(application)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                        
+                              {/* ✅ Allow action based on level */}
+                              {((application.current_level === "coordinator" && userRole === "coordinator") ||
+                                (application.current_level === "warden" && userRole === "warden")) && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(application.id, "approved")}
+                                    className="bg-green-600 hover:bg-green-700"
+                                  >
+                                    Approve
+                                  </Button>
+                                
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(application.id, "rejected")}
+                                    variant="destructive"
+                                  >
+                                    Reject
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          // Final state
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center gap-1">
+                              {getStatusIcon(application.status)}
+                              <span>{application.status}</span>
+                            </div>
+                            <span className="text-xs text-gray-400">
+                              By: {application.approved_by}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              On: {new Date(application.updatedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </TableCell>
 
                   </TableRow>
                 ))}
@@ -512,88 +429,16 @@ export function LeaveApplications(): JSX.Element {
         </CardContent>
       </Card>
 
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Leave Application Details</DialogTitle>
-            <DialogDescription>
-              Review and update leave application
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedApplication && (
-            <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Student</label>
-                    <p className="font-medium">{selectedApplication.student}</p>
-                    <p className="text-sm text-gray-500">Room No: {selectedApplication.roomNo}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Duration</label>
-                    <p className="font-medium">
-                      {calculateDays(selectedApplication.start_date, selectedApplication.end_date)} days
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(selectedApplication.start_date).toLocaleDateString()} - {new Date(selectedApplication.end_date).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <label className="text-sm font-medium text-gray-500">Reason</label>
-                  <p className="mt-1">{selectedApplication.reason}</p>
-                </div>
-
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <span>Applied: {new Date(selectedApplication.createdAt).toLocaleDateString()}</span>
-                  <span>Status: {selectedApplication.status}</span>
-                  {selectedApplication.approvedBy && (
-                    <span>Approved by: {selectedApplication.approvedBy}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="remarks">Admin Remarks</Label>
-                <Textarea
-                  id="remarks"
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  placeholder="Add remarks or notes..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsViewDialogOpen(false)}
-                >
-                  Close
-                </Button>
-                {selectedApplication.status === 'pending' && (
-                  <>
-                    <Button
-                      onClick={() => handleStatusUpdate(selectedApplication.id, 'rejected')}
-                      variant="destructive"
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={() => handleStatusUpdate(selectedApplication.id, 'approved')}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      Approve
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ViewLeaveDialog
+        open={isViewDialogOpen}
+        setOpen={setIsViewDialogOpen}
+        selectedApplication={selectedApplication}
+        remarks={remarks}
+        setRemarks={setRemarks}
+        handleStatusUpdate={handleStatusUpdate}
+        calculateDays={calculateDays}
+        userRole={userRole}
+      />
     </div>
   )
 }

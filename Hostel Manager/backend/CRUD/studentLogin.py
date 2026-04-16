@@ -63,8 +63,8 @@ def login_Student(db:Session,student:StudentLog):
 
         return {
             "id":user.id,
+            "Email":user.email,
             "student_details": user.student_details,
-            "password":student.password,
             "warning":last_record.warning if last_record else 0
         }
     

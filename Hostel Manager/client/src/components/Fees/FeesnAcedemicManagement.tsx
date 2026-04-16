@@ -22,8 +22,9 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import { toast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
-export function FeeManagement(): JSX.Element {
+export function FeesnAcedemicManagement(): JSX.Element {
 
   const baseURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -37,6 +38,10 @@ export function FeeManagement(): JSX.Element {
   const [monthFilter, setMonthFilter] = useState<string>('')
   const [dateFilter, setDateFilter] = useState<string>('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false)
+  const [acFile,setAcFile] = useState<File | null>(null);
+  const [calendar, setCalendar] = useState([]);
+  const [tab, setTab] = useState("fees");
+  const [loadingAC, setLoadingAC] = useState(false)
 
   const [formData, setFormData] = useState({
     amount: 0,
@@ -49,7 +54,16 @@ export function FeeManagement(): JSX.Element {
   const [success, setSuccess] = useState<string>('')
   
 
+useEffect(() => {
+  fetchAC();
+}, [baseURL]);
 
+const fetchAC = async () => {
+  axios.get(`${baseURL}/admin/academic-calendar`)
+    .then(res => {
+      setCalendar(res.data);
+    })
+}
 
 useEffect(() => {
   if (formData.paymentId.length > 8) {
@@ -179,9 +193,9 @@ useEffect(() => {
       return matchesSearch && matchesStatus && matchesType && matchesMonth
   })
 
-  let bmess = filteredPayments.filter(p=> p.paymentType === 'boys mess').length
-  let gmess = filteredPayments.filter(p=> p.paymentType === 'girls mess').length
-  let camp = filteredPayments.filter(p=> p.paymentType === 'campus hostel').length
+  const bmess = filteredPayments.filter(p=> p.paymentType === 'boys mess').length
+  const gmess = filteredPayments.filter(p=> p.paymentType === 'girls mess').length
+  const camp = filteredPayments.filter(p=> p.paymentType === 'campus hostel').length
   const total = filteredPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
   const stats = {
     total: filteredPayments.length,
@@ -193,6 +207,39 @@ useEffect(() => {
     overdue: students.filter(st=> st.feesDue && new Date(st.feesDue) < new Date()).length,
     totalCollected:total,
     totalPending: students.length * 46000 - payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+  }
+
+  const uploadAC = async () => {
+    setLoadingAC(true);
+    if(!acFile){
+      toast({
+        title:"Please select a file"
+      })
+      setLoadingAC(false);
+      return;
+    }
+
+    const formData = new FormData();
+  formData.append("file", acFile);
+
+    try {
+      const res = await axios.post(`${baseURL}/admin/upload/ac`,formData,{
+         headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      })
+        toast({
+          title:"Academic Calendar Uploaded"
+        })
+    } catch (error) {
+      toast({
+        title:"Upload failed"
+      })
+      console.error("Upload error:",error);
+    } finally {
+      setLoadingAC(false); 
+      fetchAC();
+    }
   }
 
   if (loading) {
@@ -216,11 +263,19 @@ useEffect(() => {
     )
   }
   return (
-    <div className="space-y-6">
+<div className="space-y-6">
+  
+  <Tabs value={tab} onValueChange={setTab}  className="space-y-12">
+    <TabsList className="grid grid-cols-2 w-full bg-gray-100 p-1 rounded-lg">        
+      <TabsTrigger value="fees">Fees</TabsTrigger>
+      <TabsTrigger value="academic">Academic</TabsTrigger>
+    </TabsList>
+    
+    <TabsContent value='fees' className='space-y-6'>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">
-    Fee Management
-  </h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">
+        Fee Management
+      </h2>
 
   <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
   <div className="w-full sm:flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 md:flex">
@@ -652,6 +707,107 @@ useEffect(() => {
           </div>
         </CardContent>
       </Card>
+      </TabsContent>
+
+      <TabsContent value="academic">
+        <Card>
+          <CardHeader>
+            <CardTitle>Academic Calendar</CardTitle>
+            <CardDescription>
+              Upload and manage academic calendar
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+
+            {/* Upload Section */}
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
+              <Input
+                type="file"
+                accept=".png,.jpg,.jpeg,.pdf,.csv"
+                onChange={(e) => setAcFile(e.target.files?.[0] || null)}
+              />
+
+              <Button onClick={uploadAC} disabled={loadingAC}>
+                {loadingAC ? "Uploading..." : "Upload"}
+              </Button>
+            </div>
+
+            {/* Preview */}
+           {calendar && calendar.length > 0 && (
+  <div className="mt-12">
+    <h3 className="text-lg font-semibold mb-3">
+      Uploaded Academic Calendar
+    </h3>
+
+    <div className="overflow-x-auto border rounded-lg">
+      <table className="min-w-full text-sm text-left">
+        
+        {/* HEADER */}
+        <thead className="bg-gray-100 text-gray-700">
+          <tr>
+            <th className="px-4 py-2 border">Date</th>
+            <th className="px-4 py-2 border">Day</th>
+            <th className="px-4 py-2 border">Type</th>
+            <th className="px-4 py-2 border">Reason</th>
+          </tr>
+        </thead>
+
+        {/* BODY */}
+        <tbody>
+          {calendar
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            .map((day) => (
+              <tr
+                key={day.id}
+                className={`hover:bg-gray-50 ${
+                  day.is_working_day ? "bg-green-50" : "bg-red-50"
+                }`}
+              >
+                {/* DATE */}
+                <td className="px-4 py-2 border">
+                  {new Date(day.date).toLocaleDateString()}
+                </td>
+
+                {/* DAY */}
+                <td className="px-4 py-2 border">
+                  {day.day}
+                </td>
+
+                {/* TYPE */}
+                <td className="px-4 py-2 border font-medium">
+                  {day.is_working_day ? (
+                    <span className="text-green-700">Working</span>
+                  ) : (
+                    <span className="text-red-700">Holiday</span>
+                  )}
+                </td>
+
+                {/* REASON */}
+                <td className="px-4 py-2 border">
+                  {!day.is_working_day
+                    ? day.reason || "Holiday"
+                    : "—"}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+)}
+
+          {calendar.length === 0 && (
+            <p className="text-center text-gray-500">
+              No Academic Calendar Uploaded Yet
+            </p>
+          )}
+              
+          </CardContent>
+        </Card>
+      </TabsContent>
+      </Tabs>
     </div>
   )
 }

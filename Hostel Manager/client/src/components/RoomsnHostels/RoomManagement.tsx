@@ -28,7 +28,7 @@ export const RoomManagement: React.FC = () => {
   const [success, setSuccess] = useState<string>('')
   const [selStudent,setSelStudent]  = useState([])
   const [selStudentEdit,setSelStudentEdit]  = useState([])
-
+  const [tab, setTab] = useState("rooms");
 
   const [formData, setFormData] = useState({
     roomNo:'',
@@ -340,7 +340,7 @@ if (loading) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+<div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-foreground">Room Management</h2>
        
        <div className='space-x-5'>
@@ -767,5 +767,5 @@ if (loading) {
         </Card>
       )}
     </div>
-  );
-};
+  )
+}

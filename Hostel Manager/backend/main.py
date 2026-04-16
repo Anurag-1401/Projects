@@ -29,7 +29,7 @@ async def health_check(request: Request):
 @app.on_event("startup")
 async def startup_event():
     allModels.Base.metadata.create_all(bind=engine)
-    attendanceJob.start_scheduler()
+    # attendanceJob.start_scheduler()
 
 @app.get('/')
 def index():

@@ -13,33 +13,46 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def run_auto_attendance():
-    logger.info("Running auto attendance check...")
+    logger.info("🚀 Running auto attendance check...")
 
     db: Session = SessionLocal()
-
+ 
     try:
         connected_macs = get_connected_macs()
+        logger.info(f"📡 Connected MACs: {connected_macs}")
+
         students = db.query(StudentAdded).all()
+        logger.info(f"👥 Total Students: {len(students)}")
 
         for student in students:
 
+            print(f"\n👤 Checking Student: {student.name}")
+            print(f"   📌 Stored MAC: {student.mac_address}")
+
             if not student.mac_address:
+                print("   ⚠ No MAC stored → Skipping")
                 continue
 
+            # Check if already marked
             exists = db.query(Attendance).filter(
                 Attendance.studentId == student.id,
                 func.date(Attendance.date) == date.today()
             ).first()
 
             if exists:
+                print("   ⏭ Already marked today → Skipping")
                 continue
 
-            # 🔥 MATCH MAC
-            if student.mac_address.lower() in connected_macs:
+            student_mac = student.mac_address.lower().replace("-", ":")
+
+            print(f"   🔄 Normalized MAC: {student_mac}")
+
+            # 🔥 MATCH CHECK
+            if student_mac in connected_macs:
+                print(f"   ✅ MATCH FOUND → {student.name}")
 
                 now = datetime.now()
 
-                # 🔥 USE EXISTING SCHEMA
                 attendance_data = AttendanceCreate(
                     studentId=student.id,
                     name=student.name,
@@ -50,13 +63,18 @@ def run_auto_attendance():
                     date=now
                 )
 
-                # 🔥 USE EXISTING LOGIC
                 add_attendance(attendance_data, db)
 
+                print(f"   🎯 Attendance Marked for {student.name}")
+
+            else:
+                print("   ❌ No match found")
+
         db.commit()
+        print("\n✅ Attendance cycle completed\n")
 
     except Exception as e:
-        print("Error in auto attendance:", e)
+        print("❌ Error in auto attendance:", e)
 
     finally:
         db.close()

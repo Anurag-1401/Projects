@@ -15,7 +15,7 @@ import { LeaveApplications } from '@/components/LeaveApp/leaveApplication'
 import { DashboardStats } from '@/components/Dashboard/DashboardCards'
 import { VisitorToManagement } from '../Visitors/visitorsTo'
 import { StudentDetails } from '../Students/StudentDetails'
-import { FeeManagement } from '../Fees/feesManagement'
+import { FeesnAcedemicManagement } from '@/components/Fees/FeesnAcedemicManagement'
 import Navbar from './navbar'
 import ChatBot from '@/hooks/assistant'
 
@@ -100,7 +100,7 @@ export default function HostelManagementSystem(): JSX.Element {
           </TabsContent>
 
           <TabsContent value="fees">
-            <FeeManagement />
+            <FeesnAcedemicManagement />
           </TabsContent>
 
 

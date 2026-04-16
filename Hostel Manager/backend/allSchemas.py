@@ -9,6 +9,8 @@ class AdminNew(BaseModel):
     password:Optional[str] = None
     role: Optional[str] = "admin"
     name : Optional[str] = ""
+    branch: str | None = None
+    year: int | None = None
 
 
 class AdminLog(BaseModel):
@@ -127,8 +129,8 @@ class StudentOut(StudentAdd):
 
 class StudentOutLogin(BaseModel):
     id:int
+    Email:str
     student_details:Optional[StudentOut] = None
-    password:str
     warning:Optional[int] = None
 
     class Config:
@@ -234,6 +236,7 @@ class LeaveApplicationUpdate(BaseModel):
 class LeaveApplicationOut(LeaveApplicationBase):
     id: int
     approved_by: Optional[str]
+    current_level:Optional[str] = None
     student:str
     roomNo:str
     response:str

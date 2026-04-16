@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from CRUD import leave as le_crud
 from db import get_db
 from allSchemas import LeaveApplicationCreate,LeaveApplicationUpdate,LeaveApplicationOut
-
+from allModels import LeaveApplication
 
 router = APIRouter(
     prefix='/leave',
@@ -43,3 +43,18 @@ def getLeaves(name:Optional[str] = None,db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
     return leaveApplications
+
+
+@router.get("/coordinator-leaves")
+def get_coordinator_leaves(db: Session = Depends(get_db)):
+
+    return db.query(LeaveApplication).filter(
+        LeaveApplication.current_level == "coordinator"
+    ).all()
+
+@router.get("/warden-leaves")
+def get_warden_leaves(db: Session = Depends(get_db)):
+
+    return db.query(LeaveApplication).filter(
+        LeaveApplication.current_level == "warden"
+    ).all()

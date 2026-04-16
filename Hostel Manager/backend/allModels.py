@@ -13,6 +13,8 @@ class AdminCreate(Base):
     email = Column(String, unique=True, nullable=False)
     name = Column(String)
     role = Column(String, default="admin")
+    branch = Column(String)
+    year = Column(BigInteger)
     password = Column(String)
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
@@ -60,7 +62,7 @@ class StudentAdded(Base):
 
 
 
-class StudentCreate(Base):
+class StudentCreate(Base): 
     __tablename__ = "StudentCreate"
 
     id = Column(BigInteger, primary_key=True, index=True)
@@ -111,7 +113,7 @@ class RoomAssignment(Base):
 
     id = Column(BigInteger, primary_key=True)
     roomNo = Column(String,ForeignKey("rooms.roomNo", ondelete="CASCADE"), unique=True, nullable=False)
-    assignedBy = Column(String, ForeignKey("AdminCreate.email"))
+    assignedBy = Column(String, ForeignKey("AdminCreate.email",onupdate="CASCADE",ondelete="SET NULL"), nullable=False)
     assignedDate = Column(DateTime, default=datetime.now(timezone.utc))
     available = Column(BigInteger)
     allocatedTo = Column(String)
@@ -185,6 +187,9 @@ class LeaveApplication(Base):
     start_date = Column(DateTime)
     end_date = Column(DateTime)
     status = Column(String, default="pending")
+    current_level = Column(String, default="warden")  
+    coordinator_status = Column(String, default="pending")
+    warden_status = Column(String, default="pending")
     response = Column(String,default='Not yet responded')
     approved_by = Column(String, default="Not yet approved")
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
@@ -219,3 +224,26 @@ class Assistant(Base):
     createdAt = Column(DateTime, default=datetime.now(timezone.utc))
     updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
+
+class AcademicCalendar(Base):
+    __tablename__ = "academic_calendar"
+
+    id = Column(BigInteger, primary_key=True)
+    date = Column(Date, unique=True)
+    is_working_day = Column(Boolean)
+    reason = Column(String, nullable=True)
+    day = Column(String)  
+
+
+class Hostels(Base):
+    __tablename__ = "hostels"
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(String, unique=True, nullable=False)
+    location = Column(String)
+    total_wings_per_hostel = Column(BigInteger)
+    total_floors_per_wing = Column(BigInteger)
+    total_rooms_per_floor_per_wing = Column(BigInteger)
+    createdBy = Column(String, ForeignKey("AdminCreate.email",onupdate="CASCADE",ondelete="SET NULL"), nullable=False)
+    createdAt = Column(DateTime, default=datetime.now(timezone.utc))
+    updatedAt = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

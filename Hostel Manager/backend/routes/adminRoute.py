@@ -1,8 +1,10 @@
-from fastapi import Depends,status,HTTPException ,APIRouter
-from CRUD import admin as ad_crud
+from django import db
+from fastapi import Depends, File, UploadFile,status,HTTPException ,APIRouter
+from CRUD import admin as ad_crud,ac
 from sqlalchemy.orm import Session
 from db import get_db
 from allSchemas import AdminOut,AdminNew,AdminLog
+from allModels import AcademicCalendar
 
 router = APIRouter(
     prefix='/admin',
@@ -50,8 +52,6 @@ def byGoogle(admin:AdminLog,db:Session = Depends(get_db)):
     return Admin
 
              
-
-
 @router.get('/get/{id}',status_code=status.HTTP_200_OK,response_model=AdminOut)
 def getAd(id,db:Session=Depends(get_db)):
     Admin = ad_crud.get_Admin(id,db)
@@ -61,6 +61,28 @@ def getAd(id,db:Session=Depends(get_db)):
     
     return Admin
 
+
+@router.post('/upload/ac',status_code=status.HTTP_201_CREATED)
+async def upload_ac(file:UploadFile = File(...),db:Session=Depends(get_db)):
+    content = await file.read()
+
+    res = ac.upload_ac(db, content)
+    
+    if not res:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='Error Uploading')
+    
+    return res
+
+
+@router.get('/academic-calendar', status_code=200)
+def get_academic_calendar(db: Session = Depends(get_db)):
+
+    data = db.query(AcademicCalendar).order_by(AcademicCalendar.date).all()
+
+    if not data:
+        raise HTTPException(status_code=404, detail="No calendar data found")
+
+    return data
 
 
 

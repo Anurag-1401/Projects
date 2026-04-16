@@ -20,7 +20,7 @@ export default function Navbar() {
         navigate('/',{replace:true})
     }
 
-    const logger = JSON.parse(localStorage.getItem("adminCreds")); 
+    const logger = JSON.parse(localStorage.getItem("adminCreds") || localStorage.getItem("User") || '{}'); 
 
     return(
         <header className="bg-white shadow-sm border-b">

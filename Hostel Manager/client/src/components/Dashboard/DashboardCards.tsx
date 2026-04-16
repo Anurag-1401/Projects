@@ -10,7 +10,14 @@ import {
   AlertTriangle,
   Bell,
   DollarSign,
+  Hotel
 } from 'lucide-react'
+import { useState } from 'react'
+import HostelsDialog from './dialogs/HostelsDialog'
+import StudentsDialog from './dialogs/StudentsDialog'
+import AttendanceDialog from './dialogs/AttendanceDialog'
+import PaymentsDialog from './dialogs/PaymentsDialog'
+import RoomsDialog from './dialogs/RoomsDialog'
 
 
 export function DashboardStats(): JSX.Element {
@@ -28,8 +35,21 @@ export function DashboardStats(): JSX.Element {
 
   const overdue = students.filter(st=> st.feesDue && new Date(st.feesDue) < new Date()).length
 
+  const [openLevel1, setOpenLevel1] = useState(false)
+  const [openLevel2, setOpenLevel2] = useState(false)
+  const [activeDialog, setActiveDialog] = useState<string | null>(null)
+  const [selectedStat, setSelectedStat] = useState(null)
+  const [selectedHostel, setSelectedHostel] = useState(null)
+  const [selectedWing, setSelectedWing] = useState(null)
 
   const stats = [
+    {
+      title: 'Total Hostels',
+      value: students.length,
+      icon: Hotel,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+    },
     {
       title: 'Total Students',
       value: students.length,
@@ -81,6 +101,11 @@ export function DashboardStats(): JSX.Element {
     
   ]
 
+  const handleStatClick = (title) => {
+    setSelectedStat(title)
+    setOpenLevel1(true)
+  }
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -109,7 +134,9 @@ export function DashboardStats(): JSX.Element {
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index} className="hover:shadow-md transition-shadow">
+            <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setActiveDialog(stat.title) }
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -150,10 +177,14 @@ export function DashboardStats(): JSX.Element {
                 <Badge variant="destructive">{pendingComplaints.length}</Badge>
               </div>
             )}
-            {0 > 0 && (
-              <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
+            {overdue > 0 && (
+              <div className={`flex items-center justify-between p-2 rounded ${
+                overdue > 0 ? "bg-orange-50" : "bg-gray-50"
+              }`}>
                 <span className="text-sm">Overdue payments</span>
-                <Badge variant="secondary">{0}</Badge>
+                <Badge variant={overdue > 0 ? "secondary" : "outline"}>
+                  {overdue}
+                </Badge>
               </div>
             )}
             
@@ -188,6 +219,26 @@ export function DashboardStats(): JSX.Element {
       </div>
       )
      }
+
+     <HostelsDialog 
+        open={activeDialog === "Total Hostels"} 
+        onClose={() => setActiveDialog(null)} 
+      />
+
+      <StudentsDialog 
+        open={activeDialog === "Total Students"} 
+        onClose={() => setActiveDialog(null)} 
+      />
+
+      <AttendanceDialog 
+        open={activeDialog === "Today's Attendance"} 
+        onClose={() => setActiveDialog(null)} 
+      />
+      
+      <RoomsDialog open={activeDialog === "Room Occupancy"} onClose={() => setActiveDialog(null)} />
+
+      <PaymentsDialog open={activeDialog === "Overdue Payments"} onClose={() => setActiveDialog(null)} />
+
     </div>
   )
 }

@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Login} from './components/login/login'
 import PrivateRoute from "./components/privateRoute";
 import PrivateLogin from "./components/privateLogin";
-import HeaderAdmin from './components/Layout/header';
 import NotFound from "./pages/NotFound";
 import { DataProvider } from "./hooks/DataContext";
 

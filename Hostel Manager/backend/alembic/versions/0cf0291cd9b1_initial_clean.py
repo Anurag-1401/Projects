@@ -21,9 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
 
-    # ✅ Step 1: Add column as NULLABLE first
-    op.add_column('StudentAdded', sa.Column('mac_address', sa.String(), nullable=True))
-
+    
     # ✅ Step 2: Fill existing rows (IMPORTANT)
     op.execute("""
         UPDATE "StudentAdded"

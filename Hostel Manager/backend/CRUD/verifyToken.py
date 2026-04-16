@@ -2,19 +2,26 @@ import os
 import json
 from dotenv import load_dotenv
 import firebase_admin
-from firebase_admin import auth, credentials
+from firebase_admin import auth, credentials,initialize_app
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+
+firebase_path = os.path.join(
+    PROJECT_ROOT,
+    "hostel-management-29452-firebase-adminsdk-fbsvc-9da19bc1ef.json"
+)
 
 security = HTTPBearer()
 
-firebase_json = os.environ.get("FIREBASE_JSON")
-if not firebase_json:
-    raise Exception("FIREBASE_JSON env variable not set")
+with open(firebase_path) as f:
+    cred_dict = json.load(f)
 
-cred_dict = json.loads(firebase_json)
+cred = credentials.Certificate(cred_dict)
+initialize_app(cred)
 
 if not firebase_admin._apps:
     cred = credentials.Certificate(cred_dict)

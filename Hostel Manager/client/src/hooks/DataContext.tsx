@@ -8,16 +8,19 @@ const DataContext = createContext(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
-const [admin, setAdmin] = useState(()=>{
-    return JSON.parse(localStorage.getItem('User') || localStorage.getItem('adminCreds') || "null");
-});
+const [logger, setLogger] = useState(() => {
+  const user = localStorage.getItem("User");
+  const admin = localStorage.getItem("adminCreds");
 
-  const logger = useMemo(() => {
-    return JSON.parse(localStorage.getItem('User') || localStorage.getItem('adminCreds') || "null");
-  }, []);
+  if (user) return { ...JSON.parse(user), role: "student" };
+  if (admin) return { ...JSON.parse(admin), role: "admin" };
+
+  return null;
+});
   
   const [students, setStudents] = useState<any[]>([]);
   const [Rooms, setRooms] = useState<any[]>([]);
+  const [hostels, setHostels] = useState<any[]>([]);
   const [RoomsAssigned, setRoomsAssigned] = useState<any[]>([]);
   const [payments, setPayments] = useState([])
   const [attendance, setAttendance] = useState<any[]>([]);
@@ -28,16 +31,16 @@ const [admin, setAdmin] = useState(()=>{
   const [error, setError] = useState<string | null>(null);
 
    useEffect(()=>{
-    if(!admin || !admin.Email) return;
+    if(!logger) return;
     refetchAll()
-  },[admin])
+  },[logger])
   
   const fetchStudents = async () => {
     try {
       const res = await axios.get(`${baseURL}/student/get-students`);
       if (res.status === 200){
         setStudents(res.data) 
-        console.log("Students",res);
+        // console.log("Students",res);
       } 
     } catch (err) {
       setError("Failed to load students");
@@ -50,7 +53,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/room/get-rooms`);
       if (res.status === 200) {
         setRooms(res.data);
-        console.log("Rooms",res);
+        // console.log("Rooms",res);
         }
     } catch (err) {
       setError("Failed to load Rooms");
@@ -63,7 +66,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/room/get-assignment`);
       if (res.status === 200) {
         setRoomsAssigned(res.data);
-        console.log("Assigned Rooms",res);
+        // console.log("Assigned Rooms",res);
         }
     } catch (err) {
       setError("Failed to load Assigned Rooms");
@@ -76,7 +79,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/attendance/get-attendance`);
       if (res.status === 200) {
         setAttendance(res.data);
-        console.log("Attendance",res);
+        // console.log("Attendance",res);
         }
     } catch (err) {
       setError("Failed to load attendance");
@@ -89,7 +92,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/complaint/get-complaints`);
       if (res.status === 200) {
         setComplaints(res.data);
-        console.log("Complaints",res);
+        // console.log("Complaints",res);
         }
     } catch (err) {
       setError("Failed to load complaints");
@@ -102,7 +105,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/leave/get-leaves`);
       if (res.status === 200) {
         setApplications(res.data);
-        console.log("Applications",res);
+        // console.log("Applications",res);
         }
     } catch (err) {
       setError("Failed to load applications");
@@ -115,10 +118,9 @@ const [admin, setAdmin] = useState(()=>{
       const response = await axios.get(`${baseURL}/visitors/get-visitors`)
       if (response.status===200) {
         setVisitors(response.data)
-        console.log("List of Visitors",response)
+        // console.log("List of Visitors",response)
       }
     } catch (error) {
-      console.error('Failed to fetch Visitors:', error)
       setError('Failed to load Visitors')
       toast({
         title:"Visitors Not Found"
@@ -131,7 +133,7 @@ const [admin, setAdmin] = useState(()=>{
       const res = await axios.get(`${baseURL}/payment/get-payment`);
       if (res.status === 200) {
         setPayments(res.data);
-        console.log("Payments",res);
+        // console.log("Payments",res);
         }
     } catch (err) {
       setError("Failed to load Payments");
@@ -167,7 +169,7 @@ const [admin, setAdmin] = useState(()=>{
   
   return (
     <DataContext.Provider
-      value={{ students, Rooms, RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll ,admin,setAdmin}}
+      value={{ students, Rooms, hostels, RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll ,logger,setLogger}}
     >
       {children}
     </DataContext.Provider>
