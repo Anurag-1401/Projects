@@ -1,14 +1,10 @@
-import React, { useState,useEffect, useMemo } from 'react';
+import React, { useMemo, useState} from 'react';
 import { useData } from '@/hooks/DataContext'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge';
-import { Building, Users, Bed, Wrench ,HousePlus,AlertCircle,UserPlusIcon,Edit,Trash2} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { HousePlus,AlertCircle,UserPlusIcon,Edit,Trash2} from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import axios from 'axios';
 import { toast } from '@/hooks/use-toast';
@@ -17,23 +13,20 @@ export const HostelManagement: React.FC = () => {
 
 
   const baseURL = import.meta.env.VITE_BACKEND_URL;
+  const admin = JSON.parse(localStorage.getItem('adminCreds') || '{}');
+  const {hostels,setHostels,refetchAll,loading} = useData();
 
-  const {hostels,refetchAll,loading} = useData();
-
-  const [selectedFloor, setSelectedFloor] = useState<number | 'all'>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingHostel, setEditingHostel] = useState(null)
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<string>('')
-  const [selStudent,setSelStudent]  = useState([])
-  const [selStudentEdit,setSelStudentEdit]  = useState([])
 
   const [formData, setFormData] = useState({
   name: '',
   location: '',
-  total_wings_per_hostel: '',
-  total_floors_per_wing: '',
-  total_rooms_per_floor_per_wing: ''
+  total_wings_per_hostel: 0,
+  total_floors_per_wing: 0,
+  total_rooms_per_floor_per_wing: 0
 })
 
 
@@ -47,12 +40,16 @@ export const HostelManagement: React.FC = () => {
 
     const method = editingHostel ? "put" : "post"
 
-    const res = await axios[method](`${baseURL}${url}`, formData)
+    const res = await axios[method](`${baseURL}${url}`, {
+      ...formData,
+      createdBy:admin?.Email
+    })
 
     if (res.status === 200 || res.status === 201) {
       toast({ title: editingHostel ? "Hostel Updated" : "Hostel Added" })
-      refetchAll.hostels()
       setIsDialogOpen(false)
+      await refetchAll.hostels()
+      resetForm()
     }
   } catch (err) {
     setError("Error saving hostel")
@@ -63,18 +60,33 @@ const deleteHostel = async (hostel) => {
   if (!confirm(`Delete ${hostel.name}?`)) return
 
   await axios.delete(`${baseURL}/hostel/delete/${hostel.id}`)
-
+    
   toast({ title: "Hostel Deleted" })
-  refetchAll.hostels()
+
+  setHostels(prev => prev.filter(h => h.id !== hostel.id))
+}
+
+const handleEdit = (hostel) => {
+  setEditingHostel(hostel)
+
+    setFormData({
+      name: hostel.name,
+      location: hostel.location,
+      total_wings_per_hostel: hostel.total_wings_per_hostel,
+      total_floors_per_wing: hostel.total_floors_per_wing,
+      total_rooms_per_floor_per_wing: hostel.total_rooms_per_floor_per_wing
+    })
+
+    setIsDialogOpen(true)
 }
 
 const resetForm = (): void => {
     setFormData({
         name: '',
         location: '',
-        total_wings_per_hostel: '',
-        total_floors_per_wing: '',
-        total_rooms_per_floor_per_wing: ''
+        total_wings_per_hostel: 0,
+        total_floors_per_wing: 0,
+        total_rooms_per_floor_per_wing: 0
     });
 
     setEditingHostel(null)
@@ -138,26 +150,42 @@ if (loading) {
       />
 
       <Input
+        type='number'
         placeholder="Wings"
         value={formData.total_wings_per_hostel}
-        onChange={(e)=>setFormData({...formData,total_wings_per_hostel:e.target.value})}
+        onChange={(e)=>setFormData({...formData,total_wings_per_hostel:Number(e.target.value)})}
       />
 
       <Input
+        type='number'
         placeholder="Floors per Wing"
         value={formData.total_floors_per_wing}
-        onChange={(e)=>setFormData({...formData,total_floors_per_wing:e.target.value})}
+        onChange={(e)=>setFormData({...formData,total_floors_per_wing:Number(e.target.value)})}
       />
 
       <Input
-        placeholder="Rooms per Floor"
+        type='number'
+        placeholder="Rooms per Floor per Wing"
         value={formData.total_rooms_per_floor_per_wing}
-        onChange={(e)=>setFormData({...formData,total_rooms_per_floor_per_wing:e.target.value})}
+        onChange={(e)=>setFormData({...formData,total_rooms_per_floor_per_wing:Number(e.target.value)})}
       />
+
+  <div className="flex justify-end space-x-2 pt-4">
+      <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              resetForm();
+              setIsDialogOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
 
       <Button type="submit">
         {editingHostel ? "Update" : "Create"}
       </Button>
+      </div>
 
     </form>
 
@@ -239,49 +267,49 @@ if (loading) {
       hostel.total_rooms_per_floor_per_wing
 
     return (
-      <Card key={hostel.id}>
-        <CardHeader>
-          <CardTitle>{hostel.name}</CardTitle>
-        </CardHeader>
-
-        <CardContent className="space-y-2">
-
-          <p>📍 {hostel.location}</p>
-          <p>🏢 Wings: {hostel.total_wings_per_hostel}</p>
-          <p>🏗 Floors: {hostel.total_floors_per_wing}</p>
-          <p>🚪 Rooms/Floor: {hostel.total_rooms_per_floor_per_wing}</p>
-
-          <p className="font-bold text-lg">
-            Total Rooms: {totalRooms}
-          </p>
-
-          <div className="flex gap-2 pt-2">
-            <Button
-              size="sm"
-              onClick={() => {
-                setEditingHostel(hostel)
-                setFormData(hostel)
-                setIsDialogOpen(true)
-              }}
-            >
-              Edit
-            </Button>
-
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={() => deleteHostel(hostel)}
-            >
-              Delete
-            </Button>
-          </div>
-
-        </CardContent>
-      </Card>
+       <Card 
+                key={hostel.id} 
+                className="flex flex-col justify-between hover:shadow-lg transition-shadow duration-200 rounded-2xl w-full min-w-[300px] h-full overflow-hidden"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg font-semibold">{hostel.name}</CardTitle>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="icon" onClick={() => handleEdit(hostel)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => deleteHostel(hostel)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                   <div>
+                      {hostel.location}
+                  </div>
+                </CardHeader>
+      
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <h2 className="text-sm sm:text-base">Floor: {hostel.total_floors_per_wing}</h2>
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-sm sm:text-base">Wings: {hostel.total_wings_per_hostel}</h2>
+                      <h2 className="text-sm sm:text-base">Rooms: {totalRooms}</h2>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
     )
   })}
 </div>
 </div>
+
+{hostels.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground">No hostels found</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

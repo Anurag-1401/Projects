@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from routes import adminRoute , studentRoute ,roomRoute , visitorRoute , studentLoginRoute ,attendanceRoute, complaintsRoute,leaveRoute ,paymentRoute,tokenRoute,assistantRoute
+from routes import adminRoute , studentRoute ,roomRoute , visitorRoute , studentLoginRoute ,attendanceRoute, complaintsRoute,leaveRoute ,paymentRoute,tokenRoute,assistantRoute,hostelRoutes
 
 
 
@@ -29,5 +29,7 @@ router.include_router(paymentRoute.router)
 router.include_router(tokenRoute.router)
 
 router.include_router(assistantRoute.router)
+
+router.include_router(hostelRoutes.router)
 
 

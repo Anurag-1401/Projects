@@ -49,7 +49,7 @@ class RoomBase(BaseModel):
     occupied: Optional[int] = 0
     admin_email:Optional[str] = ""
     students: Optional[List] = []
-
+ 
 class RoomCreate(RoomBase):
     pass
 
@@ -61,7 +61,24 @@ class RoomOut(RoomBase):
         orm_mode = True
 
 
+class HostelBase(BaseModel):
+    name: str
+    location: Optional[str] = ""
+    total_wings_per_hostel: int
+    total_floors_per_wing: int
+    total_rooms_per_floor_per_wing: int
+    createdBy:str
 
+
+class HostelCreate(HostelBase):
+    pass
+
+
+class HostelOut(HostelBase):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class RoomAssignmentBase(BaseModel):

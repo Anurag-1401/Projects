@@ -61,6 +61,19 @@ const [logger, setLogger] = useState(() => {
     }
   };
 
+    const fetchhostels = async () => {
+    try {
+      const res = await axios.get(`${baseURL}/hostel/get-hostels`);
+      if (res.status === 200) {
+        setHostels(res.data);
+        // console.log("Hostels",res);
+        }
+    } catch (err) {
+      setError("Failed to load Hostels");
+      toast({ title: "Hostels Not Found" });
+    }
+  };
+
   const fetchAssignedRooms = async () => {
     try {
       const res = await axios.get(`${baseURL}/room/get-assignment`);
@@ -153,7 +166,12 @@ const [logger, setLogger] = useState(() => {
 
   const refetchAll = async () => {
     await run(async () => {
-      await Promise.all([fetchStudents(), fetchRooms(), fetchPayments(),fetchAssignedRooms(),fetchComplaints(),fetchAttendance(),fetchApplications(),fetchVisitors()]);
+      await Promise.all([fetchStudents(), 
+        fetchRooms(), fetchPayments(),
+        fetchAssignedRooms(),fetchComplaints(),
+        fetchAttendance(),fetchApplications(),
+        fetchVisitors(),fetchhostels()
+      ]);
     });
   };
 
@@ -165,11 +183,12 @@ const [logger, setLogger] = useState(() => {
   refetchAll.attendance = () => run(fetchAttendance);
   refetchAll.assignedRooms = () => run(fetchAssignedRooms);
   refetchAll.complaints = () => run(fetchComplaints);
+  refetchAll.hostels = () => run(fetchhostels);
 
   
   return (
     <DataContext.Provider
-      value={{ students, Rooms, hostels, RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll ,logger,setLogger}}
+      value={{ students, Rooms, hostels, setHostels,RoomsAssigned, attendance, complaints, applications,visitors, loading, error,payments, refetchAll ,logger,setLogger}}
     >
       {children}
     </DataContext.Provider>

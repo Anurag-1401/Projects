@@ -8,6 +8,7 @@ import PrivateRoute from "./components/privateRoute";
 import PrivateLogin from "./components/privateLogin";
 import NotFound from "./pages/NotFound";
 import { DataProvider } from "./hooks/DataContext";
+import RoomsPage from "./pages/RoomsPage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<PrivateLogin><Login/></PrivateLogin>} />
           <Route path="/home" element={ <PrivateRoute/> }/>
+          <Route path="/rooms/:hostelId/:wing" element={<RoomsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </DataProvider>
