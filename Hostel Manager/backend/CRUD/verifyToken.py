@@ -8,6 +8,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 load_dotenv()
 
+security = HTTPBearer()
+
 firebase_json = os.getenv("FIREBASE_JSON")
 
 if not firebase_json:
