@@ -1,4 +1,4 @@
-# 🏨 Anurag's Hostel Manager – Smart Hostel Management System
+# 🏨 SGGS Hostel Manager – Smart Hostel Management System
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-Active-success)
